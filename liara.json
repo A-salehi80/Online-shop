@@ -1,0 +1,12 @@
+{
+  "disks": [
+    {
+      "name": "erisshop-disk",
+      "mountTo": "static"
+    },
+    {
+      "name": "erisshop-media",
+      "mountTo": "media"
+    }
+  ]
+}
