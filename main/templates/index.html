@@ -1310,13 +1310,20 @@
                       </ul>
                     </div>
                      {% else %}
-                     <a href="{% url 'usermanager:login' %}">
+                    <div><a href="{% url 'usermanager:login' %}">
                       <div
                         class="flex h-8 cursor-pointer items-center justify-center rounded-lg border border-secondary-light px-4 text-sm font-medium text-quaternary-700 transition-colors duration-200 hover:bg-tertiary-500 hover:text-primary-light dark:border-primary-light/5 dark:text-primary-light dark:hover:bg-tertiary-500 dark:hover:text-primary-light"
                       >
-                        ورود \ ثبت نام
+                        ورود
                       </div>
-                    </a>
+                    </a></div>
+                     <div><a href="{% url 'usermanager:register' %}">
+                      <div
+                        class="flex h-8 cursor-pointer items-center justify-center rounded-lg border border-secondary-light px-4 text-sm font-medium text-quaternary-700 transition-colors duration-200 hover:bg-tertiary-500 hover:text-primary-light dark:border-primary-light/5 dark:text-primary-light dark:hover:bg-tertiary-500 dark:hover:text-primary-light"
+                      >
+                         ثبت نام
+                      </div>
+                    </a></div>
             {% endif %}
                   </div>
 
@@ -3393,7 +3400,7 @@
                 </div>
                 <div class="flex gap-x-4">
                   <!-- Account -->
-
+{% if user.is_authenticated %}
                   <button
                     aria-controls="user-account-drawer-navigation"
                     class="cursor-pointer text-quaternary-700 dark:text-primary-light"
@@ -3405,13 +3412,15 @@
                       <use xlink:href="#user" />
                     </svg>
                   </button>
-                  <!-- <a href="./login.html">
+                    {% else %}
+                   <a href="{% url 'usermanager:login' %}">
                     <div
                       class="flex h-8 cursor-pointer items-center justify-center rounded-lg border border-secondary-light px-4 text-xs font-medium text-quaternary-700 transition-colors duration-200 hover:bg-tertiary-500 hover:text-primary-light dark:border-primary-light/5 dark:text-primary-light dark:hover:bg-tertiary-500 dark:hover:text-primary-light xs:text-sm"
                     >
                       ورود \ ثبت نام
                     </div>
-                  </a> -->
+                  </a>
+                    {% endif %}
                   <!-- Cart -->
                   <button
                     aria-controls="user-basket-drawer-navigation"
@@ -4238,6 +4247,7 @@
             class="mb-6 flex items-center justify-between gap-x-4 border-b border-secondary-light pb-5 dark:border-primary-light/5"
           >
             <!-- Close Button -->
+
             <button
               aria-controls="user-account-drawer-navigation"
               class="text-quaternary-700 dark:text-primary-light"
@@ -4270,7 +4280,7 @@
                         src="{% static 'images/user.png'%}"
                       />
                     </span>
-                    <span class="line-clamp-1">تست تست تست تسستست تسست </span>
+                    <span class="line-clamp-1">{{ user.username}} </span>
                   </span>
                   <span>
                     <svg class="h-6 w-6">
@@ -4343,7 +4353,7 @@
               <li>
                 <a
                   class="flex items-center justify-between rounded-lg px-4 py-3 text-red-500 hover:bg-red-500/10 dark:text-red-400 hover:dark:bg-red-400/10"
-                  href="#"
+                  href="{% url 'usermanager:logout' %}"
                 >
                   <div class="flex items-center gap-x-2">
                     <svg class="h-6 w-6">
