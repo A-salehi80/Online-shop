@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .models import Blog
+from usermanager.models import Profile
 
 
 def index(request):
@@ -7,6 +8,8 @@ def index(request):
 
     context = {
         'blog': blog,
+
+
     }
     return render(request, 'index.html', context)
 

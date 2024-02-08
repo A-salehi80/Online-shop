@@ -16,7 +16,7 @@ from django.utils.encoding import smart_str
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 
-
+SESSION_COOKIE_AGE = 7200
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 

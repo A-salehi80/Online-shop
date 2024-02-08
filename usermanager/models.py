@@ -3,8 +3,9 @@ from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, Permi
 from django.contrib.auth.validators import UnicodeUsernameValidator
 
 
+
 class User(AbstractBaseUser, PermissionsMixin, PermissionManager):
-    email = models.EmailField( max_length=80, unique=True)
+    email = models.EmailField(blank=True, null=True)
     groups = models.OneToOneField(Group, on_delete=models.CASCADE, blank=True, null=True)
     username = models.CharField(max_length=20, unique=True, validators=[UnicodeUsernameValidator()],)
     USERNAME_FIELD = 'username'
@@ -34,6 +35,7 @@ class Profile(models.Model):
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(blank=True, null=True)
     user = models.OneToOneField(User, blank=True, null=True, on_delete=models.CASCADE)
+
 
 
 

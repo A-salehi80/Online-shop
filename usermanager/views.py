@@ -1,10 +1,11 @@
 from django.shortcuts import render
 from django.shortcuts import render, redirect
-from django.contrib.auth.forms import UserCreationForm
+from .forms import UserCreationForm, UserRegBase
 from django.contrib.auth import login
 
 
 def register(request):
+
 	if request.method != 'POST':
 		form = UserCreationForm()
 	else:
@@ -12,7 +13,7 @@ def register(request):
 		if form.is_valid():
 			new_user = form.save()
 			login(request, new_user)
-			return redirect('learning_logs:index')
+			return redirect('main:index')
 
 	context = {'form': form}
 	return render(request, 'registration/registeration.html', context)
