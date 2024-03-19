@@ -944,7 +944,7 @@
           </h1>
           <form action="{% url 'usermanager:register' %}" method="post" >
           {% csrf_token %}
-          {{ form.error_messages }}
+
           <div class="space-y-3 mb-4">
 
             <div class="space-y-4">
@@ -1038,13 +1038,13 @@
                   id="email"
                   dir="auto"
                   class="peer w-full rounded-lg border-none bg-transparent p-4 text-left text-quaternary-700 placeholder-transparent focus:outline-none focus:ring-0 dark:text-primary-light"
-                  placeholder=" "
+                  placeholder="ایمیل "
                 />
 
                 <span
                   class="pointer-events-none absolute start-2.5 top-0 -translate-y-1/2 bg-primary-light px-2 py-0.5 text-sm text-quaternary-600 transition-all peer-placeholder-shown:top-1/2 peer-placeholder-shown:text-base peer-focus:top-0 peer-focus:text-sm dark:bg-secondary-dark dark:text-quaternary-300"
                 >
-                  email
+                  ایمیل
                 </span>
               </label>
                 {% if form.has_error %}
