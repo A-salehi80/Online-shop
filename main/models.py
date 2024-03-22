@@ -99,15 +99,23 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
+    color = models.ForeignKey(Colors, on_delete=models.CASCADE,blank=True, null=True)
 
-    def save(self, *args, **kwargs,):
-        existing_cart_item = CartItem.objects.filter(item=self.item, cart=self.cart).first()
+    def save(self,*args, **kwargs):
+        color = Colors.objects.filter(item=self.item).first()
+        existing_cart_item = CartItem.objects.filter(item=self.item, cart=self.cart,color=self.color).first()
         if existing_cart_item:
             existing_cart_item.quantity = self.quantity+existing_cart_item.quantity
             super(CartItem, existing_cart_item).save(*args, **kwargs)
-            
         else:
             super(CartItem, self).save()
+
+        if color.id == self.color.id:
+
+            super(CartItem, self).save(*args, **kwargs)
+
+        else:
+            raise ValueError('رنگ مورد نظر با رنگ های محصول همخوانی ندارد')
 
     def __str__(self):
 

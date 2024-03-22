@@ -1,5 +1,7 @@
 from django.shortcuts import render
 from .models import Blog
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 from usermanager.models import Profile
 from django.db.models import Sum
 from django.shortcuts import redirect, get_object_or_404
@@ -13,8 +15,8 @@ def index(request):
     large_banner = Large_banner.objects.all()
     if request.user.is_authenticated:
         prof = request.user.profile
-        cart = prof.cart
-        cart_count = cart.cartitem_set.all().count()
+        cart = prof.cart.cartitem_set.all()
+        cart_count = cart.count()
         main_page = Main_Page.objects.all()[:1].get()
         large_banner = Large_banner.objects.all()
 
@@ -23,7 +25,8 @@ def index(request):
            'cart_count': cart_count,
            'categories': categories,
             'main_page':main_page,
-            'large_banner':large_banner
+            'large_banner':large_banner,
+            'cart':cart
 
         }
         return render(request, 'index.html', context)
@@ -32,7 +35,8 @@ def index(request):
         'blog': blog,
         'categories': categories,
         'main_page': main_page,
-        'large_banner':large_banner
+        'large_banner':large_banner,
+
     }
 
     return render(request, 'index.html', context)
@@ -51,7 +55,7 @@ def add_to_cart(request, product_id):
 def product_detail(request, product_id):
     product = Item.objects.get(id=product_id)
     context={
-        'product':product}
+        'product': product}
     return render(request, 'product-detail.html', context)
 
 
@@ -84,3 +88,23 @@ def Cart_view(request):
         'total_no':total_no
     }
     return render(request, 'Cart.html', context)
+
+@csrf_exempt
+def decrease_cart_item_quantity(request, cart_item_id, decrease_amount):
+    # Retrieve the CartItem object based on cart_item_id
+    try:
+        cart_item = CartItem.objects.get(pk=cart_item_id)
+    except CartItem.DoesNotExist:
+        return JsonResponse({'error': 'CartItem not found'}, status=404)
+
+    # Ensure that decrease_amount is a positive integer
+    decrease_amount = int(decrease_amount)
+    cart_item.quantity -= decrease_amount
+    if cart_item.quantity < 0:
+        cart_item.quantity = 0
+        cart_item.save(update_fields=['quantity'])
+
+    # Save the updated cart item
+    cart_item.save(update_fields=['quantity'])
+
+    return JsonResponse({'success': 'Quantity decreased successfully'})

@@ -22,6 +22,31 @@
 
     <!-- اینجا اضافه کنید -->
     <script defer src="{%static '/scripts/custom.js'%} "></script>
+      <script>
+function decreaseCartItemQuantity(cart_item_id,  decrease_amount) {
+    // Make an AJAX request to your Django backend
+    fetch(`/decrease_cart_item_quantity/${cart_item_id}/${ decrease_amount}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Reload the page or update the UI as needed
+            location.reload();
+        } else {
+            // Handle error response
+            console.error('خطا');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
 
     <script>
       // Set Theme from Localstorage at site load

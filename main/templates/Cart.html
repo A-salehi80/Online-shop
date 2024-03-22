@@ -2,7 +2,9 @@
 {% extends 'default.html' %}
 {% load static %}
  <html dir="rtl" lang="fa">
+
 {% block content %}
+
 
   <body>
     <div class="sr-only">
@@ -4839,17 +4841,19 @@
                               {{ item.item.name}}
                           </a>
                           <!-- Variant -->
+
                           <div class="flex items-center gap-x-2">
                             <span
-                              class="h-4 w-4 rounded-full"
-                              style="background: #782f2f"
+                              class="h-5 w-5 rounded-full border-2 border-senary-200 shadow-base dark:border-primary-light/30"
+                              style="background-color: {{item.color.color_tag}}"
                             ></span>
                             <span
                               class="text-xs text-quaternary-600 dark:text-quaternary-300 xs:text-sm"
                             >
-                              {{ item.item.color}}</span
+                              {{ item.color.color_fa}}</span
                             >
                           </div>
+
                         </div>
                         <!-- Quantity -->
                         <div
@@ -4871,7 +4875,7 @@
                               type="number"
                               class="flex h-5 w-5 w-full select-none items-center justify-center bg-transparent text-center text-sm font-medium text-quaternary-700 outline-none dark:text-primary-light sm:h-6 sm:w-6 sm:text-lg"
                             />
-                            <button type="button" data-action="decrement" >
+                            <button type="button" data-action="decrement" onclick="decreaseCartItemQuantity('{{ item.id }}', 1)" >
                               <svg
                                 class="h-5 w-5 text-red-600 dark:text-red-500 sm:h-6 sm:w-6"
                               >
