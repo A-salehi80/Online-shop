@@ -102,9 +102,56 @@ def decrease_cart_item_quantity(request, cart_item_id, decrease_amount):
     cart_item.quantity -= decrease_amount
     if cart_item.quantity < 0:
         cart_item.quantity = 0
-        cart_item.save(update_fields=['quantity'])
 
-    # Save the updated cart item
-    cart_item.save(update_fields=['quantity'])
+        cart_item.save(update_fields=['quantity'])
+    else:
+
+        # Save the updated cart item
+        cart_item.save(update_fields=['quantity'])
+    if cart_item.quantity == 0:
+        cart_item.delete()
 
     return JsonResponse({'success': 'Quantity decreased successfully'})
+@csrf_exempt
+def increase_cart_item_quantity(request, cart_item_id, increase_amount):
+    # Retrieve the CartItem object based on cart_item_id
+    try:
+        cart_item = CartItem.objects.get(pk=cart_item_id)
+    except CartItem.DoesNotExist:
+        return JsonResponse({'error': 'CartItem not found'}, status=404)
+
+    # Ensure that decrease_amount is a positive integer
+    increase_amount = int(increase_amount)
+    cart_item.quantity += increase_amount
+    if cart_item.quantity > 10:
+        cart_item.quantity = 10
+
+        cart_item.save(update_fields=['quantity'])
+    else:
+
+        # Save the updated cart item
+        cart_item.save(update_fields=['quantity'])
+
+    return JsonResponse({'success': 'Quantity increased successfully'})
+
+
+@csrf_exempt
+def delete_item(request,cart_item_id):
+
+    try:
+        cart_item = CartItem.objects.get(pk=cart_item_id)
+    except CartItem.DoesNotExist:
+        return JsonResponse({'error': 'CartItem not found'}, status=404)
+
+    cart_item.delete()
+    return JsonResponse({'success': 'item deleted successfully'})
+@csrf_exempt
+def delete_all(request,cart_item_id):
+
+    try:
+        cart_item = CartItem.objects.get(pk=cart_item_id)
+    except CartItem.DoesNotExist:
+        return JsonResponse({'error': 'CartItem not found'}, status=404)
+
+    cart_item.delete()
+    return JsonResponse({'success': 'item deleted successfully'})
