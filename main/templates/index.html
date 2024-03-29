@@ -1224,11 +1224,19 @@
                           >
                             <span class="flex items-center gap-x-4">
                               <span class="min-w-fit">
-                                <img
+                                  {% if user.profile.profile %}
+                                      <img
                                   alt="profile"
                                   class="h-8 w-8 rounded-full"
-                                  src="{%static 'images/user.png' %}"
+                                  src="{{ user.profile.profile.url }}"
                                 />
+                                      {% else  %}
+                                      <img
+                                  alt="profile"
+                                  class="h-8 w-8 rounded-full"
+                                  src="{% static 'images/user.png' %}"
+                                />
+                                      {% endif %}
                               </span>
                               <span class="line-clamp-1"> {{ user.username }} </span>
                             </span>
@@ -1330,7 +1338,7 @@
             {% endif %}
                   </div>
 
-{% if user.is_authenticated %}
+
                   <!-- Basket -->
                   <div>
                     <button
@@ -1345,10 +1353,11 @@
                           <use xlink:href="#cart" />
                         </svg>
                       </span>
+                        {% if user.profile.cart %}
                       <span
                         class="absolute -right-2.5 -top-2.5 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-tertiary-500 text-sm font-bold text-primary-light"
                       >
-                       {{cart_count}}
+                       {{total_no}}
                       </span>
                     </button>
 
@@ -1361,7 +1370,7 @@
                         <div
                           class="text-sm text-quaternary-600 dark:text-quaternary-300"
                         >
-                          4 مورد
+                            {{ total_no }} مورد
                         </div>
                         <a
                           class="flex items-center gap-x-1 text-sm text-tertiary-500 dark:text-tertiary-400"
@@ -1380,17 +1389,17 @@
                       <div class="h-60">
                         <ul
                           class="main-scroll h-full space-y-2 divide-y divide-secondary-light overflow-y-auto p-5 pl-2 dark:divide-primary-light/5"
-                        >{% if item in cart %}
-                            {% for item in cart %}
+                        >
+                            {% for item in user_cart %}
                         <li>
                             <div class="flex gap-x-2 py-5">
                               <!-- Product Image -->
 
                               <div class="relative min-w-fit">
-                                <a href="./product-detail.html">
-                                  <img alt="" class="h-[120px] w-[120px]" loading="lazy" src="./assets/images/products/p1.png">
+                                <a href="{% url 'main:product' item.item.id %}">
+                                  <img alt="" class="h-[120px] w-[120px]" loading="lazy" src="{{ item.item.image1.url }}">
                                 </a>
-                                <button class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark" type="button">
+                                <button class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark" type="button" onclick="DeleteCartItem('{{item.id}}')">
                                   <svg class="h-6 w-6 text-red-600 dark:text-red-500">
                                     <use xlink:href="#close"></use>
                                   </svg>
@@ -1400,7 +1409,7 @@
                               <div class="w-full space-y-1.5">
                                 <!-- Product Title -->
 
-                                <a class="line-clamp-2 h-12 text-quaternary-700 dark:text-primary-light" href="./product-detail.html">
+                                <a class="line-clamp-2 h-12 text-quaternary-700 dark:text-primary-light" href="{% url 'main:product' item.item.id %}">
                                     {{ item.item.name}}
                                 </a>
                                 <!-- Product Attribute -->
@@ -1408,25 +1417,25 @@
                                   <div>تعداد : {{ item.quantity }}</div>
                                   <div class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"></div>
                                   <div class="flex items-center gap-x-2">
-                                    <span class="h-4 w-4 rounded-full" style="background: rgb(128, 128, 128)"></span>
+                                    <span class="h-4 w-4 rounded-full border-2 " style="background-color: {{ item.color.color_tag}}"></span>
                                     <span> {{ item.item.co }}</span>
                                   </div>
                                 </div>
                                 <div class="flex items-center justify-between gap-x-2">
                                   <!-- Product Price -->
                                   <div class="text-tertiary-500 dark:text-tertiary-400">
-                                    <span class="text-lg font-bold">1,800,000</span>
+                                    <span class="text-lg font-bold">{{ item.item.price}}</span>
                                     <span class="text-sm">تومان</span>
                                   </div>
                                   <!-- Product Quantity -->
                                   <div class="flex h-10 w-24 items-center justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5">
-                                    <button type="button" data-action="increment">
+                                    <button type="button" data-action="increment" onclick="increaseCartItemQuantity('{{ item.id}}')">
                                       <svg class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400">
                                         <use xlink:href="#plus"></use>
                                       </svg>
                                     </button>
                                     <input value="1" disabled="" type="number" class="flex h-5 w-full grow select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light">
-                                    <button type="button" data-action="decrement">
+                                    <button type="button" data-action="decrement" onclick="decreaseCartItemQuantity('{{ item.id}}')">
                                       <svg class="h-5 w-5 text-red-600 dark:text-red-500">
                                         <use xlink:href="#minus"></use>
                                       </svg>
@@ -1437,9 +1446,6 @@
                             </div>
                           </li>
                             {% endfor %}
-                            {% endif %}
-
-
                         </ul>
                       </div>
 
@@ -1458,7 +1464,7 @@
                           <div
                             class="text-quaternary-600 dark:text-quaternary-300"
                           >
-                            <span class="font-bold">1,200,000</span>
+                            <span class="font-bold">{{ total_price}}</span>
                             <span class="text-sm">تومان</span>
                           </div>
                         </div>
@@ -1472,28 +1478,28 @@
                         </a>
                       </div>
                     </div>
+                  {% else %}
 
-                    <!--                    Empty Basket -->
-                    <!--                                <div-->
-                    <!--                                        class="z-10 !ml-5 hidden w-[400px] overflow-hidden rounded-lg border-t-2 border-t-tertiary-500 bg-primary-light dark:border-t-tertiary-400 dark:bg-secondary-dark"-->
-                    <!--                                        id="dropdownBasketDesktop"-->
-                    <!--                                >-->
-                    <!--                                    <div class="flex justify-center items-center py-6">-->
-                    <!--                                        <div class="flex items-center justify-center flex-col gap-y-4">-->
-                    <!--                                            <svg class="w-20 h-20 text-quaternary-600 dark:text-quaternary-300">-->
-                    <!--                                                <use xlink:href="#order-off"/>-->
-                    <!--                                            </svg>-->
-                    <!--                                            <p class="text-quaternary-600 dark:text-quaternary-300 text-lg">-->
-                    <!--                                                سبد خرید شما خالی میباشد-->
-                    <!--                                            </p>-->
-                    <!--                                            <a class="btn-primary w-full py-3" href="#">-->
-                    <!--                                                فروشگاه-->
-                    <!--                                            </a>-->
-                    <!--                                        </div>-->
-                    <!--                                    </div>-->
-                    <!--                                </div>-->
+
+    <div class="z-10 !ml-5 hidden w-[400px] overflow-hidden rounded-lg border-t-2 border-t-tertiary-500 bg-primary-light dark:border-t-tertiary-400 dark:bg-secondary-dark"
+            id="dropdownBasketDesktop">
+
+        <div class="flex justify-center items-center py-6">
+            <div class="flex items-center justify-center flex-col gap-y-4">
+                <svg class="w-20 h-20 text-quaternary-600 dark:text-quaternary-300">
+                    <use xlink:href="#order-off"/>
+                </svg>
+                <p class="text-quaternary-600 dark:text-quaternary-300 text-lg">
+                    سبد خرید شما خالی میباشد</p>
+                <a class="btn-primary w-full py-3" href="{% url 'usermanager:login' %}">
+                    ورود به حساب کاربری
+                </a>
+            </div>
+        </div>
+    </div>
+                  {% endif %}
                   </div>
-                {% endif %}
+
                   <!-- Theme -->
                   <div
                     class="cursor-pointer text-quaternary-700 dark:text-primary-light"
@@ -1547,69 +1553,18 @@
                             dir="ltr"
                           >
                             <ul dir="rtl" id="mega-menu-parents">
+                                {% for item in category_menu %}
                               <li>
                                 <a
                                   class="flex py-4 pr-4 text-quaternary-700 dark:text-primary-light"
-                                  data-category-parent="1"
+                                  data-category-parent="{{ item.id }}"
                                   href="./shop.html"
                                 >
-                                  مردانه
+                                    {{item.name }}
                                 </a>
                               </li>
-                              <li>
-                                <a
-                                  class="flex py-4 pr-4 text-quaternary-700 dark:text-primary-light"
-                                  data-category-parent="2"
-                                  href="./shop.html"
-                                >
-                                  زنانه
-                                </a>
-                              </li>
-                              <li>
-                                <a
-                                  class="flex py-4 pr-4 text-quaternary-700 dark:text-primary-light"
-                                  data-category-parent="3"
-                                  href="./shop.html"
-                                >
-                                  بچه گانه
-                                </a>
-                              </li>
-                              <li>
-                                <a
-                                  class="flex py-4 pr-4 text-quaternary-700 dark:text-primary-light"
-                                  data-category-parent="4"
-                                  href="./shop.html"
-                                >
-                                  ساعت
-                                </a>
-                              </li>
-                              <li>
-                                <a
-                                  class="flex py-4 pr-4 text-quaternary-700 dark:text-primary-light"
-                                  data-category-parent="5"
-                                  href="./shop.html"
-                                >
-                                  کیف
-                                </a>
-                              </li>
-                              <li>
-                                <a
-                                  class="flex py-4 pr-4 text-quaternary-700 dark:text-primary-light"
-                                  data-category-parent="6"
-                                  href="./shop.html"
-                                >
-                                  آرایشی و بهداشتی
-                                </a>
-                              </li>
-                              <li>
-                                <a
-                                  class="flex py-4 pr-4 text-quaternary-700 dark:text-primary-light"
-                                  data-category-parent="7"
-                                  href="./shop.html"
-                                >
-                                  عطر و ادکلن
-                                </a>
-                              </li>
+                                {% endfor %}
+
                             </ul>
                           </div>
                           <!-- Left side -->
@@ -1623,8 +1578,14 @@
                               dir="rtl"
                               id="mega-menu-childs"
                             >
+
+    {% for item in category_menu %}
+
+
+
                               <!-- categories Child -->
-                              <div class="hidden p-5" data-category-child="1">
+
+                              <div class="hidden p-5" data-category-child="{{ item.id }}">
                                 <!-- head -->
                                 <div class="mb-4">
                                   <a
@@ -1639,7 +1600,7 @@
                                 </div>
                                 <div
                                   class="flex flex-grow flex-wrap gap-x-14 gap-y-8"
-                                >
+                                >{% for item in item.subcategory_set.all %}
                                   <div class="space-y-2">
                                     <a
                                       class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
@@ -1648,1496 +1609,31 @@
                                       <span
                                         class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
                                       ></span>
-                                      <div>لباس مردانه</div>
+                                      <div>{{ item.title }}</div>
                                       <svg class="h-5 w-5">
                                         <use xlink:href="#chevron-left"></use>
                                       </svg>
                                     </a>
                                     <ul>
+                                        {% for item in item.childcategory_set.all %}
                                       <li>
                                         <a
                                           class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
+                                          href="{% url 'main:childfinder' item.id  %}"
                                         >
-                                          شلوار
+                                            {{ item.title}}
                                         </a>
                                       </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          لباس زیر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          پیراهن
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جلیقه
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جوراب
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          لباس زیر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          شلوارک
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>کفش مردانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش اسپورت
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش پیاده روی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش ورزشی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش مجلسی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش راحتی
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>اکسسوری</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          عینک
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کمربند
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          زیورآلات
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          چتر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کراوات
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جاکلیدی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کلاه
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-                              <!-- categories Child -->
+                                            {% endfor %}
 
-                              <div class="hidden p-5" data-category-child="2">
-                                <!-- head -->
-                                <div class="mb-4">
-                                  <a
-                                    class="flex items-center gap-x-1 py-2 text-sm text-tertiary-500 dark:text-tertiary-400"
-                                    href="./shop.html"
-                                  >
-                                    <div>مشاهده همه</div>
-                                    <svg class="h-5 w-5">
-                                      <use xlink:href="#chevron-left"></use>
-                                    </svg>
-                                  </a>
-                                </div>
-                                <div
-                                  class="flex flex-grow flex-wrap gap-x-14 gap-y-8"
-                                >
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>لباس زنانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          شلوار
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          لباس زیر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          پیراهن
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جلیقه
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جوراب
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          لباس زیر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          شلوارک
-                                        </a>
-                                      </li>
                                     </ul>
                                   </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>کفش زنانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش اسپورت
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش پیاده روی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش ورزشی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش مجلسی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش راحتی
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>اکسسوری</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          عینک
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کمربند
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          زیورآلات
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          چتر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کراوات
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جاکلیدی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کلاه
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-                              <!-- categories Child -->
+        {% endfor %}
 
-                              <div class="hidden p-5" data-category-child="3">
-                                <!-- head -->
-                                <div class="mb-4">
-                                  <a
-                                    class="flex items-center gap-x-1 py-2 text-sm text-tertiary-500 dark:text-tertiary-400"
-                                    href="./shop.html"
-                                  >
-                                    <div>مشاهده همه</div>
-                                    <svg class="h-5 w-5">
-                                      <use xlink:href="#chevron-left"></use>
-                                    </svg>
-                                  </a>
-                                </div>
-                                <div class="flex flex-wrap gap-x-14 gap-y-8">
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>لباس پسرانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          شلوار
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          لباس زیر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          پیراهن
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جلیقه
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جوراب
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          لباس زیر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          شلوارک
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>کفش پسرانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش اسپورت
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش پیاده روی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش ورزشی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش مجلسی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش راحتی
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>اکسسوری پسرانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          عینک
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کمربند
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          زیورآلات
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          چتر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کراوات
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جاکلیدی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کلاه
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>لباس دخترانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          شلوار
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          لباس زیر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          پیراهن
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جلیقه
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جوراب
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          لباس زیر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          شلوارک
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>کفش دخترانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش اسپورت
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش پیاده روی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش ورزشی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش مجلسی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کفش راحتی
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>اکسسوری دخترانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          عینک
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کمربند
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          زیورآلات
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          چتر
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کراوات
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          جاکلیدی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کلاه
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-                              <!-- categories Child -->
-
-                              <div class="hidden p-5" data-category-child="4">
-                                <!-- head -->
-                                <div class="mb-4">
-                                  <a
-                                    class="flex items-center gap-x-1 py-2 text-sm text-tertiary-500 dark:text-tertiary-400"
-                                    href="./shop.html"
-                                  >
-                                    <div>مشاهده همه</div>
-                                    <svg class="h-5 w-5">
-                                      <use xlink:href="#chevron-left"></use>
-                                    </svg>
-                                  </a>
-                                </div>
-                                <div
-                                  class="flex flex-grow flex-wrap gap-x-14 gap-y-8"
-                                >
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>ساعت مردانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت رولکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت لوکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت مجلسی
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>ساعت زنانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت رولکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت لوکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت مجلسی
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>ساعت پسرانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت رولکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت لوکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت مجلسی
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>ساعت دخترانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت رولکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت لوکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ساعت مجلسی
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
                                 </div>
                               </div>
 
-                              <!-- categories Child -->
-
-                              <div class="hidden p-5" data-category-child="5">
-                                <!-- head -->
-                                <div class="mb-4">
-                                  <a
-                                    class="flex items-center gap-x-1 py-2 text-sm text-tertiary-500 dark:text-tertiary-400"
-                                    href="./shop.html"
-                                  >
-                                    <div>مشاهده همه</div>
-                                    <svg class="h-5 w-5">
-                                      <use xlink:href="#chevron-left"></use>
-                                    </svg>
-                                  </a>
-                                </div>
-                                <div
-                                  class="flex flex-grow flex-wrap gap-x-14 gap-y-8"
-                                >
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>کیف مردانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف لوکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف مجلسی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف دانشگاهی
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>کیف زنانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف لوکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف مجلسی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف دانشگاهی
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>کیف پسرانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف لوکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف مجلسی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف مدرسه
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>کیف دخترانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف لوکس
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف مجلسی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          کیف مدرسه
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-                              <!-- categories Child -->
-
-                              <div class="hidden p-5" data-category-child="6">
-                                <!-- head -->
-                                <div class="mb-4">
-                                  <a
-                                    class="flex items-center gap-x-1 py-2 text-sm text-tertiary-500 dark:text-tertiary-400"
-                                    href="./shop.html"
-                                  >
-                                    <div>مشاهده همه</div>
-                                    <svg class="h-5 w-5">
-                                      <use xlink:href="#chevron-left"></use>
-                                    </svg>
-                                  </a>
-                                </div>
-                                <div
-                                  class="flex flex-grow flex-wrap gap-x-14 gap-y-8"
-                                >
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>آرایشی</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          آرایش صورت
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          آرایش چشم و ابرو
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          آرایش لب
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ابزار آرایشی
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          آرایش و مراقبت ناخن
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>پوست</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          مرطوب کننده پوست
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          بهداشت پوست
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          مراقبت از پوست
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>مو</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          مراقبت مو
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          بهداشت مو
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          حالت دهنده مو
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          رنگ مو و ملزومات
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
-                              <!-- categories Child -->
-
-                              <div class="hidden p-5" data-category-child="7">
-                                <!-- head -->
-                                <div class="mb-4">
-                                  <a
-                                    class="flex items-center gap-x-1 py-2 text-sm text-tertiary-500 dark:text-tertiary-400"
-                                    href="./shop.html"
-                                  >
-                                    <div>مشاهده همه</div>
-                                    <svg class="h-5 w-5">
-                                      <use xlink:href="#chevron-left"></use>
-                                    </svg>
-                                  </a>
-                                </div>
-                                <div
-                                  class="flex flex-grow flex-wrap gap-x-14 gap-y-8"
-                                >
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>عطر و ادکلن مردانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          عطر مردانه
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          عطر جیبی مردانه
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ست هدیه مردانه
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-
-                                  <div class="space-y-2">
-                                    <a
-                                      class="flex items-center gap-x-2 text-quaternary-700 hover:text-tertiary-500 dark:text-primary-light hover:dark:text-tertiary-400"
-                                      href="./shop.html"
-                                    >
-                                      <span
-                                        class="h-5 w-0.5 rounded-full bg-tertiary-500 dark:bg-tertiary-500"
-                                      ></span>
-                                      <div>عطر و ادکلن زنانه</div>
-                                      <svg class="h-5 w-5">
-                                        <use xlink:href="#chevron-left"></use>
-                                      </svg>
-                                    </a>
-                                    <ul>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          عطر زنانه
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          عطر جیبی زنانه
-                                        </a>
-                                      </li>
-                                      <li>
-                                        <a
-                                          class="block py-2 text-sm text-quaternary-600 hover:text-tertiary-500 dark:text-quaternary-300 hover:dark:text-tertiary-400"
-                                          href="./shop.html"
-                                        >
-                                          ست هدیه زنانه
-                                        </a>
-                                      </li>
-                                    </ul>
-                                  </div>
-                                </div>
-                              </div>
+{% endfor %}
                             </div>
                           </div>
                         </div>
@@ -3309,7 +1805,7 @@
                     <span
                       class="absolute -right-2.5 -top-2.5 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-tertiary-500 text-sm font-bold text-primary-light dark:text-primary-light"
                     >
-                      10
+                      {{ total_no }}
                     </span>
                   </button>
                 </div>
@@ -4178,7 +2674,7 @@
                     <span
                       class="darktext-quaternary-500 relative inline-flex h-5 w-5 items-center justify-center rounded-full bg-tertiary-500 text-sm text-primary-light dark:text-primary-light"
                     >
-                      2
+                      {{ total_no }}
                     </span>
                   </span>
                 </a>
@@ -4260,14 +2756,15 @@
               <span class="sr-only">Close menu</span>
             </button>
             <h5 class="text-lg text-quaternary-600 dark:text-quaternary-300">
-              سبد خرید <span class="text-sm">( 4 )</span>
+              سبد خرید <span class="text-sm">{{total_no}}</span>
             </h5>
           </div>
           <div class="h-full pb-[150px]">
             <ul
               class="main-scroll h-full space-y-2 divide-y divide-secondary-light overflow-y-auto p-4 dark:divide-primary-light/5"
             >
-              <li>
+                {% for item in user_cart %}
+                              <li>
                 <div class="flex gap-x-2 py-5">
                   <!-- Product Image -->
 
@@ -4277,7 +2774,7 @@
                         alt=""
                         class="h-20 w-20"
                         loading="lazy"
-                        src="./assets/images/products/p1.png"
+                        src="{{item.item.image1.url}}"
                       />
                     </a>
                     <button
@@ -4297,35 +2794,35 @@
                       class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light"
                       href="./product-detail.html"
                     >
-                      تیشرت اسپورت مردانه
+                        {{ item.item.name}}
                     </a>
                     <!-- Product Attribute -->
                     <div
                       class="flex items-center gap-x-2 text-xs text-quaternary-500 dark:text-senary-300"
                     >
-                      <div>تعداد : 2</div>
+                      <div>تعداد :{{item.quantity }}</div>
                       <div
                         class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"
                       ></div>
                       <div class="flex items-center gap-x-2">
                         <span
                           class="h-4 w-4 rounded-full"
-                          style="background: rgb(128, 128, 128)"
+                          style="background-color: {{ item.color.color_tag}}"
                         ></span>
-                        <span> طوسی</span>
+                        <span> {{ item.color.color_fa }}</span>
                       </div>
                     </div>
                     <div class="flex items-center justify-between gap-x-2">
                       <!-- Product Price -->
                       <div class="text-tertiary-500 dark:text-tertiary-400">
-                        <span class="font-bold">1,800,000</span>
+                        <span class="font-bold">{{ item.item.price}}</span>
                         <span class="text-xs">تومان</span>
                       </div>
                       <!-- Product Quantity -->
                       <div
                         class="flex h-8 w-20 justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5"
                       >
-                        <button type="button" data-action="increment">
+                        <button type="button" data-action="increment" onclick="increaseCartItemQuantity('{{item.id}}')">
                           <svg
                             class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400"
                           >
@@ -4338,7 +2835,7 @@
                           type="number"
                           class="flex h-5 w-5 w-full select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light"
                         />
-                        <button type="button" data-action="decrement">
+                        <button type="button" data-action="decrement"onclick="decreaseCartItemQuantity('{{item.id}}')">
                           <svg class="h-5 w-5 text-red-600 dark:text-red-500">
                             <use xlink:href="#minus" />
                           </svg>
@@ -4348,249 +2845,10 @@
                   </div>
                 </div>
               </li>
-              <li>
-                <div class="flex gap-x-2 py-5">
-                  <!-- Product Image -->
+                {% endfor %}
 
-                  <div class="relative min-w-fit">
-                    <a href="./product-detail.html">
-                      <img
-                        alt=""
-                        class="h-20 w-20"
-                        loading="lazy"
-                        src="./assets/images/products/p2.png"
-                      />
-                    </a>
-                    <button
-                      class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark"
-                      type="button"
-                    >
-                      <svg class="h-6 w-6 text-red-600 dark:text-red-500">
-                        <use xlink:href="#close" />
-                      </svg>
-                    </button>
-                  </div>
 
-                  <div class="w-full space-y-1.5">
-                    <!-- Product Title -->
 
-                    <a
-                      class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light"
-                      href="./product-detail.html"
-                    >
-                      کلاه اسپورت مردانه
-                    </a>
-                    <!-- Product Attribute -->
-                    <div
-                      class="flex items-center gap-x-2 text-xs text-quaternary-500 dark:text-senary-300"
-                    >
-                      <div>تعداد : 2</div>
-                      <div
-                        class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"
-                      ></div>
-                      <div class="flex items-center gap-x-2">
-                        <span
-                          class="h-4 w-4 rounded-full"
-                          style="background: rgb(128, 128, 128)"
-                        ></span>
-                        <span> طوسی</span>
-                      </div>
-                    </div>
-                    <div class="flex items-center justify-between gap-x-2">
-                      <!-- Product Price -->
-                      <div class="text-tertiary-500 dark:text-tertiary-400">
-                        <span class="font-bold">1,800,000</span>
-                        <span class="text-xs">تومان</span>
-                      </div>
-                      <!-- Product Quantity -->
-                      <div
-                        class="flex h-8 w-20 justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5"
-                      >
-                        <button type="button" data-action="increment">
-                          <svg
-                            class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400"
-                          >
-                            <use xlink:href="#plus" />
-                          </svg>
-                        </button>
-                        <input
-                          value="1"
-                          disabled
-                          type="number"
-                          class="flex h-5 w-5 w-full select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light"
-                        />
-                        <button type="button" data-action="decrement">
-                          <svg class="h-5 w-5 text-red-600 dark:text-red-500">
-                            <use xlink:href="#minus" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="flex gap-x-2 py-5">
-                  <!-- Product Image -->
-
-                  <div class="relative min-w-fit">
-                    <a href="./product-detail.html">
-                      <img
-                        alt=""
-                        class="h-20 w-20"
-                        loading="lazy"
-                        src="./assets/images/products/p3.png"
-                      />
-                    </a>
-                    <button
-                      class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark"
-                      type="button"
-                    >
-                      <svg class="h-6 w-6 text-red-600 dark:text-red-500">
-                        <use xlink:href="#close" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div class="w-full space-y-1.5">
-                    <!-- Product Title -->
-
-                    <a
-                      class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light"
-                      href="./product-detail.html"
-                    >
-                      کفش اسپورت مردانه
-                    </a>
-                    <!-- Product Attribute -->
-                    <div
-                      class="flex items-center gap-x-2 text-xs text-quaternary-500 dark:text-senary-300"
-                    >
-                      <div>تعداد : 2</div>
-                      <div
-                        class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"
-                      ></div>
-                      <div class="flex items-center gap-x-2">
-                        <span
-                          class="h-4 w-4 rounded-full"
-                          style="background: rgb(128, 128, 128)"
-                        ></span>
-                        <span> طوسی</span>
-                      </div>
-                    </div>
-                    <div class="flex items-center justify-between gap-x-2">
-                      <!-- Product Price -->
-                      <div class="text-tertiary-500 dark:text-tertiary-400">
-                        <span class="font-bold">1,800,000</span>
-                        <span class="text-xs">تومان</span>
-                      </div>
-                      <!-- Product Quantity -->
-                      <div
-                        class="flex h-8 w-20 justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5"
-                      >
-                        <button type="button" data-action="increment">
-                          <svg
-                            class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400"
-                          >
-                            <use xlink:href="#plus" />
-                          </svg>
-                        </button>
-                        <input
-                          value="1"
-                          disabled
-                          type="number"
-                          class="flex h-5 w-5 w-full select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light"
-                        />
-                        <button type="button" data-action="decrement">
-                          <svg class="h-5 w-5 text-red-600 dark:text-red-500">
-                            <use xlink:href="#minus" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="flex gap-x-2 py-5">
-                  <!-- Product Image -->
-
-                  <div class="relative min-w-fit">
-                    <a href="./product-detail.html">
-                      <img
-                        alt=""
-                        class="h-20 w-20"
-                        loading="lazy"
-                        src="./assets/images/products/p4.png"
-                      />
-                    </a>
-                    <button
-                      class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark"
-                      type="button"
-                    >
-                      <svg class="h-6 w-6 text-red-600 dark:text-red-500">
-                        <use xlink:href="#close" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div class="w-full space-y-1.5">
-                    <!-- Product Title -->
-
-                    <a
-                      class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light"
-                      href="./product-detail.html"
-                    >
-                      کفش اسپورت مردانه
-                    </a>
-                    <!-- Product Attribute -->
-                    <div
-                      class="flex items-center gap-x-2 text-xs text-quaternary-500 dark:text-senary-300"
-                    >
-                      <div>تعداد : 2</div>
-                      <div
-                        class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"
-                      ></div>
-                      <div class="flex items-center gap-x-2">
-                        <span
-                          class="h-4 w-4 rounded-full"
-                          style="background: red"
-                        ></span>
-                        <span> قرمز</span>
-                      </div>
-                    </div>
-                    <div class="flex items-center justify-between gap-x-2">
-                      <!-- Product Price -->
-                      <div class="text-tertiary-500 dark:text-tertiary-400">
-                        <span class="font-bold">1,800,000</span>
-                        <span class="text-xs">تومان</span>
-                      </div>
-                      <!-- Product Quantity -->
-                      <div
-                        class="flex h-8 w-20 justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5"
-                      >
-                        <button type="button" data-action="increment">
-                          <svg
-                            class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400"
-                          >
-                            <use xlink:href="#plus" />
-                          </svg>
-                        </button>
-                        <input
-                          value="1"
-                          disabled
-                          type="number"
-                          class="flex h-5 w-5 w-full select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light"
-                        />
-                        <button type="button" data-action="decrement">
-                          <svg class="h-5 w-5 text-red-600 dark:text-red-500">
-                            <use xlink:href="#minus" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
             </ul>
           </div>
           <!-- Footer -->
@@ -4705,6 +2963,10 @@
             <!-- Section Content -->
             <div class="swiper product-slider p-px">
               <div class="swiper-wrapper">
+                  {% for item in item_list %}
+
+
+
                 <div class="swiper-slide">
                   <!-- Product Card -->
                   <div
@@ -4719,7 +2981,7 @@
                           <img
                             alt=""
                             class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p8.png' %}"
+                            src="{{item.image1.url}}"
                           />
                         </a>
                       </div>
@@ -4727,9 +2989,9 @@
                       <div class="mb-2">
                         <a
                           class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
+                          href="{% url 'main:product' item.id %}"
                         >
-                          کیف دوشی زنانه درسا مدل 49787
+                            {{ item.name}}
                         </a>
                       </div>
                       <!-- Prices -->
@@ -4754,7 +3016,7 @@
                           <div
                             class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
                           >
-                            4,000,000
+                              {{ item.price}}
                             <span class="text-xs font-light md:text-sm"
                               >تومان</span
                             >
@@ -4764,420 +3026,8 @@
                     </div>
                   </div>
                 </div>
-                <div class="swiper-slide">
-                  <!-- Product Card -->
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p6.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی مردانه نیو بالانس مدل M520LN7
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left">
-                          <del
-                            class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                          >
-                            10,000,000
-                          </del>
-                        </div>
-                        <div class="flex items-center justify-between">
-                          <div>
-                            <p
-                              class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                            >
-                              50%
-                            </p>
-                          </div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            5,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p6.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کیف اداری مردانه درسا مدل 53156
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left">
-                          <del
-                            class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                          >
-                            10,000,000
-                          </del>
-                        </div>
-                        <div class="flex items-center justify-between">
-                          <div>
-                            <p
-                              class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                            >
-                              10%
-                            </p>
-                          </div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            9,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p7.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کیف دستی دلسی مدل CHATELET AIR 2.0 کد 1676350
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left">
-                          <del
-                            class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                          >
-                            550,000
-                          </del>
-                        </div>
-                        <div class="flex items-center justify-between">
-                          <div>
-                            <p
-                              class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                            >
-                              10%
-                            </p>
-                          </div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            500,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p2.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی مردانه نیو بالانس مدل Mdrftlm2
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left">
-                          <del
-                            class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                          >
-                            10,000,000
-                          </del>
-                        </div>
-                        <div class="flex items-center justify-between">
-                          <div>
-                            <p
-                              class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                            >
-                              20%
-                            </p>
-                          </div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            8,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p5.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی زنانه مدل LT RBK
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left">
-                          <del
-                            class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                          >
-                            200,000
-                          </del>
-                        </div>
-                        <div class="flex items-center justify-between">
-                          <div>
-                            <p
-                              class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                            >
-                              50%
-                            </p>
-                          </div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            100,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p4.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی زنانه مدل M47767
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left">
-                          <del
-                            class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                          >
-                            440,000
-                          </del>
-                        </div>
-                        <div class="flex items-center justify-between">
-                          <div>
-                            <p
-                              class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                            >
-                              10%
-                            </p>
-                          </div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            400,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p8.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی مردانه نیو بالانس مدل Mdrftbg2
-                        </a>
-                      </div>
+                                    {% endfor %}
 
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left">
-                          <del
-                            class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                          >
-                            12,000,000
-                          </del>
-                        </div>
-                        <div class="flex items-center justify-between">
-                          <div>
-                            <p
-                              class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                            >
-                              15%
-                            </p>
-                          </div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            10,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
               </div>
               <div class="swiper-button-next"></div>
               <div class="swiper-button-prev"></div>
@@ -5212,6 +3062,7 @@
 
             <div class="swiper product-slider p-px">
               <div class="swiper-wrapper">
+                  {% for item in item_list_latest %}
                 <div class="swiper-slide">
                   <div
                     class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
@@ -5226,7 +3077,7 @@
                           <img
                             alt=""
                             class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p4.png' %}"
+                            src="{{item.image1.url}}"
                           />
                         </a>
                       </div>
@@ -5234,9 +3085,9 @@
                       <div class="mb-2">
                         <a
                           class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
+                          href="{% url 'main:product' item.id %}"
                         >
-                          کفش پیاده روی زنانه مدل M47767
+                            {{ item.name}}
                         </a>
                       </div>
                       <!-- Prices -->
@@ -5249,7 +3100,7 @@
                           <div
                             class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
                           >
-                            400,000
+                              {{ item.price}}
                             <span class="text-xs font-light md:text-sm"
                               >تومان</span
                             >
@@ -5259,335 +3110,8 @@
                     </div>
                   </div>
                 </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p3.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی مردانه نیو بالانس مدل Mdrftbg2
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            10,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <!-- Product Card -->
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p8.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کیف دوشی زنانه درسا مدل 49787
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            4,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p2.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی مردانه نیو بالانس مدل Mdrftlm2
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            8,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p5.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی زنانه مدل LT RBK
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            100,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <!-- Product Card -->
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p1.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی مردانه نیو بالانس مدل M520LN7
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            5,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p6.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کیف اداری مردانه درسا مدل 53156
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            9,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="./assets/images/products/p7.png"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کیف دستی دلسی مدل CHATELET AIR 2.0 کد 1676350
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            500,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  {% endfor %}
+
           </div>
               <div class="swiper-button-next"></div>
               <div class="swiper-button-prev"></div>
@@ -5678,6 +3202,7 @@
             <!-- Section Content -->
             <div class="swiper product-slider p-px">
               <div class="swiper-wrapper">
+                  {% for item in item_list %}
                 <div class="swiper-slide">
                   <div
                     class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
@@ -5692,7 +3217,7 @@
                           <img
                             alt=""
                             class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p2.png' %}"
+                            src="{{item.image1.url}}"
                           />
                         </a>
                       </div>
@@ -5702,7 +3227,7 @@
                           class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
                           href="./product-detail.html"
                         >
-                          کفش پیاده روی مردانه نیو بالانس مدل Mdrftlm2
+                            {{ item.name}}
                         </a>
                       </div>
                       <!-- Prices -->
@@ -5715,7 +3240,7 @@
                           <div
                             class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
                           >
-                            8,000,000
+                              {{ item.price}}
                             <span class="text-xs font-light md:text-sm"
                               >تومان</span
                             >
@@ -5725,335 +3250,8 @@
                     </div>
                   </div>
                 </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p2.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی زنانه مدل LT RBK
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            100,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <!-- Product Card -->
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p1.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی مردانه نیو بالانس مدل M520LN7
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            5,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p6.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کیف اداری مردانه درسا مدل 53156
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            9,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p7.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کیف دستی دلسی مدل CHATELET AIR 2.0 کد 1676350
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            500,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p4.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی زنانه مدل M47767
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            400,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <!-- Product Card -->
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="{% static '/images/products/p3.png' %}"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کفش پیاده روی مردانه نیو بالانس مدل Mdrftbg2
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            10,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="swiper-slide">
-                  <!-- Product Card -->
-                  <div
-                    class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                  >
-                    <div
-                      class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                    >
-                      <!-- image -->
-                      <div class="mb-2 md:mb-5" draggable="false">
-                        <a href="./product-detail.html">
-                          <img
-                            alt=""
-                            class="mx-auto w-32 rounded-lg md:w-auto"
-                            src="./assets/images/products/p8.png"
-                          />
-                        </a>
-                      </div>
-                      <!-- title -->
-                      <div class="mb-2">
-                        <a
-                          class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                          href="./product-detail.html"
-                        >
-                          کیف دوشی زنانه درسا مدل 49787
-                        </a>
-                      </div>
-                      <!-- Prices -->
-                      <div class="flex flex-col">
-                        <!-- Old price -->
-                        <div class="h-5 text-left"></div>
-                        <div class="flex items-center justify-between">
-                          <div></div>
-                          <!-- New price -->
-                          <div
-                            class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                          >
-                            4,000,000
-                            <span class="text-xs font-light md:text-sm"
-                              >تومان</span
-                            >
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  {% endfor %}
+
               </div>
               <div class="swiper-button-next"></div>
               <div class="swiper-button-prev"></div>

@@ -21,7 +21,9 @@
     <script defer src="{%static '/scripts/app.js'%}"></script>
 
     <!-- اینجا اضافه کنید -->
-    <script defer src="{%static '/scripts/custom.js'%} "></script>
+    <script defer src="{%static '/scripts/custom.js'%} ">
+
+    </script>
       <script>
 function decreaseCartItemQuantity(cart_item_id,  decrease_amount) {
     // Make an AJAX request to your Django backend
@@ -72,7 +74,7 @@ function increaseCartItemQuantity(cart_item_id,  increase_amount) {
     });
 }
 </script>
-            <script>
+      <script>
 function DeleteCartItem(cart_item_id) {
     // Make an AJAX request to your Django backend
     fetch(`/delete_cart_item/${cart_item_id}/`, {
@@ -97,8 +99,45 @@ function DeleteCartItem(cart_item_id) {
     });
 }
 </script>
+<script>
+function addToCart(product_id) {
+    // Find the selected color radio button
+    var selectedColorRadioButton = document.querySelector('input[name="color"]:checked');
 
-    <script>
+    // Check if a color is selected
+    if (selectedColorRadioButton) {
+        // Extract the selected color value
+        var selectedColor = selectedColorRadioButton.value;
+
+        // Make an AJAX request to your Django backend
+        fetch(`/add_to_cart/${product_id}/${selectedColor}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Redirect to the cart view page
+                window.location.href = '{% url "main:Cart" %}';
+            } else {
+                // Handle error response
+                console.error('Failed to add product to cart');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    } else {
+        // Handle case when no color is selected
+        console.error('No color selected');
+    }
+}
+</script>
+
+      <script>
       // Set Theme from Localstorage at site load
       document.documentElement.classList.toggle(
         "dark",

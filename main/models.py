@@ -34,6 +34,7 @@ class Blog(models.Model):
             self.ID_NO = self.generate_random_code()
             super(Blog, self).save(*args, **kwargs)
         super(Blog, self).save(*args, **kwargs)
+
     def generate_random_code(self):
         return 'BLG'+''.join(random.choices(string.digits, k=8))
 
@@ -44,6 +45,22 @@ class Category(models.Model):
 
     def __str__(self):
         return self.name
+class SubCategory(models.Model):
+    category = models.ForeignKey(Category, on_delete=models.PROTECT)
+    title = models.CharField(max_length=125)
+    image = models.FileField(upload_to='img/Sub_category', blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+
+class ChildCategory(models.Model):
+    sub_category = models.ForeignKey(SubCategory, on_delete=models.PROTECT)
+    title = models.CharField(max_length=125)
+    image = models.FileField(upload_to='img/Sub_category', blank=True, null=True)
+
+    def __str__(self):
+        return self.title
 
 
 class Colors(models.Model):
@@ -69,6 +86,10 @@ class Item(models.Model):
     image3 = models.FileField(upload_to='img/items', blank=True, null=True)
     image4 = models.FileField(upload_to='img/items', blank=True, null=True)
     color = models.ManyToManyField(Colors)
+    features = models.TextField(null=True, blank=True)
+    is_special = models.BooleanField(default=False)
+    existing_no = models.SmallIntegerField(default=1)
+    child_cat = models.ForeignKey(ChildCategory, on_delete=models.PROTECT, blank=True, null=True)
 
     def save(self, *args, **kwargs):
         if not self.ID_NO:
@@ -99,10 +120,9 @@ class CartItem(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     quantity = models.IntegerField(default=1)
-    color = models.ForeignKey(Colors, on_delete=models.CASCADE,blank=True, null=True)
+    color = models.ForeignKey(Colors, on_delete=models.CASCADE, blank=True, null=True)
 
-    def save(self,*args, **kwargs):
-
+    def save(self, *args, **kwargs):
 
         valid_colors = Colors.objects.filter(item=self.item)
 
@@ -114,7 +134,7 @@ class CartItem(models.Model):
 
     def __str__(self):
 
-        a=self.item.name
+        a = self.item.name
         return a
 
 
@@ -136,6 +156,7 @@ class Main_Page(models.Model):
 class Large_banner(models.Model):
     banner = models.FileField(upload_to='img/mainpage')
     link = models.CharField(max_length=125, blank=True, null=True)
+
 
 
 

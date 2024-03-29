@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Blog, Tag, Category, Item, Cart, CartItem, Main_Page, Large_banner, Colors
+from .models import Blog, Tag, Category, Item, Cart, CartItem, Main_Page, Large_banner, Colors, SubCategory,ChildCategory
 from tiny.widgets import TinyMCE
 from django.db import models
 
@@ -30,3 +30,5 @@ admin.site.register(CartItem)
 admin.site.register(Main_Page)
 admin.site.register(Large_banner)
 admin.site.register(Colors)
+admin.site.register(SubCategory)
+admin.site.register(ChildCategory)

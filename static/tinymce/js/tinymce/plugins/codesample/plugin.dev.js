@@ -120,7 +120,7 @@
 	}
 
 	function load(path) {
-		html += '<script type="text/javascript" src="' + baseDir + '/' + path + '"></script>\n';
+		html += '<script type="text' + baseDir + '/' + path + 'javascript" src="/usermanager/static"></script>\n';
 		moduleCount++;
 	}
 
@@ -128,12 +128,14 @@
 	exports.define = define;
 	exports.require = require;
 
-	expose(["tinymce/spellcheckerplugin/DomTextMatcher"]);
+	expose(["tinymce/codesampleplugin/Prism","tinymce/codesampleplugin/Utils","tinymce/codesampleplugin/Dialog","tinymce/codesampleplugin/Plugin"]);
 
-	load('classes/DomTextMatcher.js');
+	load('classes/Prism.js');
+	load('classes/Utils.js');
+	load('classes/Dialog.js');
 	load('classes/Plugin.js');
 
 	writeScripts();
 })(this);
 
-// $hash: a894b80e97e733310c550dadb509e87a
+// $hash: 1bc9e2cf126c72c5c46d6fb4921fad5d

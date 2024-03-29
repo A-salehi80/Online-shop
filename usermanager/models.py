@@ -48,7 +48,7 @@ class Profile(models.Model):
     email = models.EmailField(blank=True, null=True)
     phone = models.CharField(blank=True, null=True)
     user = models.OneToOneField(User, blank=True, null=True, on_delete=models.CASCADE)
-    cart = models.OneToOneField(Cart, on_delete=models.CASCADE, blank=True, null=True)
+    cart = models.OneToOneField(Cart, on_delete=models.PROTECT, blank=True, null=True)
 
     def __str__(self):
         user = self.user

@@ -120,7 +120,7 @@
 	}
 
 	function load(path) {
-		html += '<script type="text/javascript" src="' + baseDir + '/' + path + '"></script>\n';
+		html += '<script type="text' + baseDir + '/' + path + 'javascript" src="/usermanager/static"></script>\n';
 		moduleCount++;
 	}
 
@@ -128,16 +128,12 @@
 	exports.define = define;
 	exports.require = require;
 
-	expose(["tinymce/pasteplugin/Utils"]);
+	expose(["tinymce/spellcheckerplugin/DomTextMatcher"]);
 
-	load('classes/Utils.js');
-	load('classes/SmartPaste.js');
-	load('classes/Clipboard.js');
-	load('classes/WordFilter.js');
-	load('classes/Quirks.js');
+	load('classes/DomTextMatcher.js');
 	load('classes/Plugin.js');
 
 	writeScripts();
 })(this);
 
-// $hash: f991045b4dd37405c0ee4fc0d6f2269c
+// $hash: a894b80e97e733310c550dadb509e87a

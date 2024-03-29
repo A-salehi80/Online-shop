@@ -4255,6 +4255,7 @@
             <ul
               class="main-scroll h-full space-y-2 divide-y divide-secondary-light overflow-y-auto p-4 dark:divide-primary-light/5"
             >
+                {% for item in user_cart %}
               <li>
                 <div class="flex gap-x-2 py-5">
                   <!-- Product Image -->
@@ -4265,12 +4266,13 @@
                         alt=""
                         class="h-20 w-20"
                         loading="lazy"
-                        src="./assets/images/products/p1.png"
+                        src="{{item.item.image1}}"
                       />
                     </a>
                     <button
                       class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark"
                       type="button"
+                      onclick="DeleteCartItem('{{ item.id }}')"
                     >
                       <svg class="h-6 w-6 text-red-600 dark:text-red-500">
                         <use xlink:href="#close" />
@@ -4285,35 +4287,35 @@
                       class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light"
                       href="./product-detail.html"
                     >
-                      تیشرت اسپورت مردانه
+                        {{item.item.name}}
                     </a>
                     <!-- Product Attribute -->
                     <div
                       class="flex items-center gap-x-2 text-xs text-quaternary-500 dark:text-senary-300"
                     >
-                      <div>تعداد : 2</div>
+                      <div>تعداد : {{ item.quantity }}</div>
                       <div
                         class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"
                       ></div>
                       <div class="flex items-center gap-x-2">
                         <span
                           class="h-4 w-4 rounded-full"
-                          style="background: rgb(128, 128, 128)"
+                          style="background-color: {{ item.color.color_tag}}"
                         ></span>
-                        <span> طوسی</span>
+                        <span> {{ item.color.color_fa}}</span>
                       </div>
                     </div>
                     <div class="flex items-center justify-between gap-x-2">
                       <!-- Product Price -->
                       <div class="text-tertiary-500 dark:text-tertiary-400">
-                        <span class="font-bold">1,800,000</span>
+                        <span class="font-bold">{{ item.item.price}}</span>
                         <span class="text-xs">تومان</span>
                       </div>
                       <!-- Product Quantity -->
                       <div
                         class="flex h-8 w-20 justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5"
                       >
-                        <button type="button" data-action="increment">
+                        <button type="button" data-action="increment" onclick="increaseCartItemQuantity('{{ item.id }}',1)">
                           <svg
                             class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400"
                           >
@@ -4321,12 +4323,12 @@
                           </svg>
                         </button>
                         <input
-                          value="1"
+                          value="{{ item.quantity }}"
                           disabled
                           type="number"
                           class="flex h-5 w-5 w-full select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light"
                         />
-                        <button type="button" data-action="decrement">
+                        <button type="button" data-action="decrement" onclick="decreaseCartItemQuantity('{{ item.id }}',1)">
                           <svg class="h-5 w-5 text-red-600 dark:text-red-500">
                             <use xlink:href="#minus" />
                           </svg>
@@ -4336,249 +4338,8 @@
                   </div>
                 </div>
               </li>
-              <li>
-                <div class="flex gap-x-2 py-5">
-                  <!-- Product Image -->
+                {% endfor %}
 
-                  <div class="relative min-w-fit">
-                    <a href="./product-detail.html">
-                      <img
-                        alt=""
-                        class="h-20 w-20"
-                        loading="lazy"
-                        src="./assets/images/products/p2.png"
-                      />
-                    </a>
-                    <button
-                      class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark"
-                      type="button"
-                    >
-                      <svg class="h-6 w-6 text-red-600 dark:text-red-500">
-                        <use xlink:href="#close" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div class="w-full space-y-1.5">
-                    <!-- Product Title -->
-
-                    <a
-                      class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light"
-                      href="./product-detail.html"
-                    >
-                      کلاه اسپورت مردانه
-                    </a>
-                    <!-- Product Attribute -->
-                    <div
-                      class="flex items-center gap-x-2 text-xs text-quaternary-500 dark:text-senary-300"
-                    >
-                      <div>تعداد : 2</div>
-                      <div
-                        class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"
-                      ></div>
-                      <div class="flex items-center gap-x-2">
-                        <span
-                          class="h-4 w-4 rounded-full"
-                          style="background: rgb(128, 128, 128)"
-                        ></span>
-                        <span> طوسی</span>
-                      </div>
-                    </div>
-                    <div class="flex items-center justify-between gap-x-2">
-                      <!-- Product Price -->
-                      <div class="text-tertiary-500 dark:text-tertiary-400">
-                        <span class="font-bold">1,800,000</span>
-                        <span class="text-xs">تومان</span>
-                      </div>
-                      <!-- Product Quantity -->
-                      <div
-                        class="flex h-8 w-20 justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5"
-                      >
-                        <button type="button" data-action="increment">
-                          <svg
-                            class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400"
-                          >
-                            <use xlink:href="#plus" />
-                          </svg>
-                        </button>
-                        <input
-                          value="1"
-                          disabled
-                          type="number"
-                          class="flex h-5 w-5 w-full select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light"
-                        />
-                        <button type="button" data-action="decrement">
-                          <svg class="h-5 w-5 text-red-600 dark:text-red-500">
-                            <use xlink:href="#minus" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="flex gap-x-2 py-5">
-                  <!-- Product Image -->
-
-                  <div class="relative min-w-fit">
-                    <a href="./product-detail.html">
-                      <img
-                        alt=""
-                        class="h-20 w-20"
-                        loading="lazy"
-                        src="./assets/images/products/p3.png"
-                      />
-                    </a>
-                    <button
-                      class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark"
-                      type="button"
-                    >
-                      <svg class="h-6 w-6 text-red-600 dark:text-red-500">
-                        <use xlink:href="#close" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div class="w-full space-y-1.5">
-                    <!-- Product Title -->
-
-                    <a
-                      class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light"
-                      href="./product-detail.html"
-                    >
-                      کفش اسپورت مردانه
-                    </a>
-                    <!-- Product Attribute -->
-                    <div
-                      class="flex items-center gap-x-2 text-xs text-quaternary-500 dark:text-senary-300"
-                    >
-                      <div>تعداد : 2</div>
-                      <div
-                        class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"
-                      ></div>
-                      <div class="flex items-center gap-x-2">
-                        <span
-                          class="h-4 w-4 rounded-full"
-                          style="background: rgb(128, 128, 128)"
-                        ></span>
-                        <span> طوسی</span>
-                      </div>
-                    </div>
-                    <div class="flex items-center justify-between gap-x-2">
-                      <!-- Product Price -->
-                      <div class="text-tertiary-500 dark:text-tertiary-400">
-                        <span class="font-bold">1,800,000</span>
-                        <span class="text-xs">تومان</span>
-                      </div>
-                      <!-- Product Quantity -->
-                      <div
-                        class="flex h-8 w-20 justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5"
-                      >
-                        <button type="button" data-action="increment">
-                          <svg
-                            class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400"
-                          >
-                            <use xlink:href="#plus" />
-                          </svg>
-                        </button>
-                        <input
-                          value="1"
-                          disabled
-                          type="number"
-                          class="flex h-5 w-5 w-full select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light"
-                        />
-                        <button type="button" data-action="decrement">
-                          <svg class="h-5 w-5 text-red-600 dark:text-red-500">
-                            <use xlink:href="#minus" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
-              <li>
-                <div class="flex gap-x-2 py-5">
-                  <!-- Product Image -->
-
-                  <div class="relative min-w-fit">
-                    <a href="./product-detail.html">
-                      <img
-                        alt=""
-                        class="h-20 w-20"
-                        loading="lazy"
-                        src="./assets/images/products/p4.png"
-                      />
-                    </a>
-                    <button
-                      class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark"
-                      type="button"
-                    >
-                      <svg class="h-6 w-6 text-red-600 dark:text-red-500">
-                        <use xlink:href="#close" />
-                      </svg>
-                    </button>
-                  </div>
-
-                  <div class="w-full space-y-1.5">
-                    <!-- Product Title -->
-
-                    <a
-                      class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light"
-                      href="./product-detail.html"
-                    >
-                      کفش اسپورت مردانه
-                    </a>
-                    <!-- Product Attribute -->
-                    <div
-                      class="flex items-center gap-x-2 text-xs text-quaternary-500 dark:text-senary-300"
-                    >
-                      <div>تعداد : 2</div>
-                      <div
-                        class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"
-                      ></div>
-                      <div class="flex items-center gap-x-2">
-                        <span
-                          class="h-4 w-4 rounded-full"
-                          style="background: red"
-                        ></span>
-                        <span> قرمز</span>
-                      </div>
-                    </div>
-                    <div class="flex items-center justify-between gap-x-2">
-                      <!-- Product Price -->
-                      <div class="text-tertiary-500 dark:text-tertiary-400">
-                        <span class="font-bold">1,800,000</span>
-                        <span class="text-xs">تومان</span>
-                      </div>
-                      <!-- Product Quantity -->
-                      <div
-                        class="flex h-8 w-20 justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5"
-                      >
-                        <button type="button" data-action="increment">
-                          <svg
-                            class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400"
-                          >
-                            <use xlink:href="#plus" />
-                          </svg>
-                        </button>
-                        <input
-                          value="1"
-                          disabled
-                          type="number"
-                          class="flex h-5 w-5 w-full select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light"
-                        />
-                        <button type="button" data-action="decrement">
-                          <svg class="h-5 w-5 text-red-600 dark:text-red-500">
-                            <use xlink:href="#minus" />
-                          </svg>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </li>
             </ul>
           </div>
           <!-- Footer -->
@@ -4592,7 +4353,7 @@
               </div>
 
               <div class="text-quaternary-600 dark:text-quaternary-300">
-                <span class="font-bold">1,200,000</span>
+                <span class="font-bold">{{ total_price}}</span>
                 <span class="text-sm">تومان</span>
               </div>
             </div>
@@ -4602,8 +4363,10 @@
             >
               مشاهده سبد خرید
             </a>
+
           </div>
         </div>
+
       </div>
 
       <main
@@ -4773,8 +4536,7 @@
             <!-- Cart Price Detail -->
             <div class="col-span-12 md:col-span-4">
               <!-- Desktop -->
-              <div
-                class="hidden rounded-lg bg-primary-light p-4 dark:bg-secondary-dark md:block"
+              <div class="hidden rounded-lg bg-primary-light p-4 dark:bg-secondary-dark md:block"
               >
                 <div
                   class="mb-2 divide-y divide-secondary-light dark:divide-primary-light/5"
@@ -4834,7 +4596,7 @@
                 </div>
               </div>
               <!-- Mobile -->
-              <div
+                <div
                 class="fixed inset-x-0 bottom-0 flex items-center gap-x-6 rounded-t-2xl bg-primary-light p-4 dark:bg-secondary-dark md:hidden"
               >
                 <a
@@ -4850,7 +4612,7 @@
                     مبلغ قابل پرداخت
                   </div>
                   <div class="text-quaternary-600 dark:text-quaternary-300">
-                    <span class="font-bold">1,200,000</span>
+                    <span class="font-bold">{{ total_price}}</span>
                     <span class="text-sm">تومان</span>
                   </div>
                 </div>

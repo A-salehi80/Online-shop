@@ -1318,6 +1318,8 @@
                     </a> -->
                   </div>
                   <!-- Basket -->
+{% if user.is_authenticated %}
+                  <!-- Basket -->
                   <div>
                     <button
                       class="group relative"
@@ -1334,7 +1336,7 @@
                       <span
                         class="absolute -right-2.5 -top-2.5 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-tertiary-500 text-sm font-bold text-primary-light"
                       >
-                        10
+                       {{cart_count}}
                       </span>
                     </button>
 
@@ -1347,7 +1349,7 @@
                         <div
                           class="text-sm text-quaternary-600 dark:text-quaternary-300"
                         >
-                          4 مورد
+                            {{ cart_count }} مورد
                         </div>
                         <a
                           class="flex items-center gap-x-1 text-sm text-tertiary-500 dark:text-tertiary-400"
@@ -1361,32 +1363,25 @@
                           </div>
                         </a>
                       </div>
+
                       <!-- Items -->
                       <div class="h-60">
                         <ul
                           class="main-scroll h-full space-y-2 divide-y divide-secondary-light overflow-y-auto p-5 pl-2 dark:divide-primary-light/5"
                         >
-                          <li>
+                        {% if user_cart %}
+                            {% for item in user_cart %}
+                        <li>
                             <div class="flex gap-x-2 py-5">
                               <!-- Product Image -->
 
                               <div class="relative min-w-fit">
                                 <a href="./product-detail.html">
-                                  <img
-                                    alt=""
-                                    class="h-[120px] w-[120px]"
-                                    loading="lazy"
-                                    src="./assets/images/products/p1.png"
-                                  />
+                                  <img alt="" class="h-[120px] w-[120px]" loading="lazy" src="{{item.item.image1.url}}">
                                 </a>
-                                <button
-                                  class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark"
-                                  type="button"
-                                >
-                                  <svg
-                                    class="h-6 w-6 text-red-600 dark:text-red-500"
-                                  >
-                                    <use xlink:href="#close" />
+                                <button class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark" type="button" onclick="DeleteCartItem('{{ item.id }}')">
+                                  <svg class="h-6 w-6 text-red-600 dark:text-red-500">
+                                    <use xlink:href="#close"></use>
                                   </svg>
                                 </button>
                               </div>
@@ -1394,68 +1389,35 @@
                               <div class="w-full space-y-1.5">
                                 <!-- Product Title -->
 
-                                <a
-                                  class="line-clamp-2 h-12 text-quaternary-700 dark:text-primary-light"
-                                  href="./product-detail.html"
-                                >
-                                  تیشرت اسپورت مردانه
+                                <a class="line-clamp-2 h-12 text-quaternary-700 dark:text-primary-light" href="./product-detail.html">
+                                    {{ item.item.name}}
                                 </a>
                                 <!-- Product Attribute -->
-                                <div
-                                  class="flex items-center gap-x-2 text-sm text-quaternary-500 dark:text-senary-300"
-                                >
-                                  <div>تعداد : 2</div>
-                                  <div
-                                    class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"
-                                  ></div>
+                                <div class="flex items-center gap-x-2 text-sm text-quaternary-500 dark:text-senary-300">
+                                  <div>تعداد : {{ item.quantity }}</div>
+                                  <div class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"></div>
                                   <div class="flex items-center gap-x-2">
-                                    <span
-                                      class="h-4 w-4 rounded-full"
-                                      style="background: rgb(128, 128, 128)"
-                                    ></span>
-                                    <span> طوسی</span>
+                                    <span class="h-4 w-4 rounded-full" style="background: {{ item.color.color_tag}}"></span>
+                                    <span> {{ item.item.co }}</span>
                                   </div>
                                 </div>
-                                <div
-                                  class="flex items-center justify-between gap-x-2"
-                                >
+                                <div class="flex items-center justify-between gap-x-2">
                                   <!-- Product Price -->
-                                  <div
-                                    class="text-tertiary-500 dark:text-tertiary-400"
-                                  >
-                                    <span class="text-lg font-bold"
-                                      >1,800,000</span
-                                    >
+                                  <div class="text-tertiary-500 dark:text-tertiary-400">
+                                    <span class="text-lg font-bold">{{ item.item.price}}</span>
                                     <span class="text-sm">تومان</span>
                                   </div>
                                   <!-- Product Quantity -->
-                                  <div
-                                    class="flex h-10 w-24 items-center justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5"
-                                  >
-                                    <button
-                                      type="button"
-                                      data-action="increment"
-                                    >
-                                      <svg
-                                        class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400"
-                                      >
-                                        <use xlink:href="#plus" />
+                                  <div class="flex h-10 w-24 items-center justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5">
+                                    <button type="button" data-action="increment" onclick="increaseCartItemQuantity('{{ item.id }}', 1)">
+                                      <svg class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400">
+                                        <use xlink:href="#plus"></use>
                                       </svg>
                                     </button>
-                                    <input
-                                      value="1"
-                                      disabled
-                                      type="number"
-                                      class="flex h-5 w-full grow select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light"
-                                    />
-                                    <button
-                                      type="button"
-                                      data-action="decrement"
-                                    >
-                                      <svg
-                                        class="h-5 w-5 text-red-600 dark:text-red-500"
-                                      >
-                                        <use xlink:href="#minus" />
+                                    <input value="{{ item.quantity }}" disabled="" type="number" class="flex h-5 w-full grow select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light">
+                                    <button type="button" data-action="decrement" onclick="decreaseCartItemQuantity('{{ item.id }}', 1)">
+                                      <svg class="h-5 w-5 text-red-600 dark:text-red-500">
+                                        <use xlink:href="#minus"></use>
                                       </svg>
                                     </button>
                                   </div>
@@ -1463,103 +1425,10 @@
                               </div>
                             </div>
                           </li>
-                          <li>
-                            <div class="flex gap-x-2 py-5">
-                              <!-- Product Image -->
+                            {% endfor %}
+                            {% endif %}
 
-                              <div class="relative min-w-fit">
-                                <a href="./product-detail.html">
-                                  <img
-                                    alt=""
-                                    class="h-[120px] w-[120px]"
-                                    loading="lazy"
-                                    src="./assets/images/products/p2.png"
-                                  />
-                                </a>
-                                <button
-                                  class="absolute -right-2 -top-2 flex h-8 w-8 items-center justify-center rounded-full bg-secondary-light dark:bg-primary-dark"
-                                  type="button"
-                                >
-                                  <svg
-                                    class="h-6 w-6 text-red-600 dark:text-red-500"
-                                  >
-                                    <use xlink:href="#close" />
-                                  </svg>
-                                </button>
-                              </div>
 
-                              <div class="w-full space-y-1.5">
-                                <!-- Product Title -->
-
-                                <a
-                                  class="line-clamp-2 h-12 text-quaternary-700 dark:text-primary-light"
-                                  href="./product-detail.html"
-                                >
-                                  کلاه اسپورت مردانه
-                                </a>
-                                <!-- Product Attribute -->
-                                <div
-                                  class="flex items-center gap-x-2 text-sm text-quaternary-500 dark:text-senary-300"
-                                >
-                                  <div>تعداد : 2</div>
-                                  <div
-                                    class="h-3 w-px rounded-full bg-senary-200 dark:bg-primary-light/5"
-                                  ></div>
-                                  <div class="flex items-center gap-x-2">
-                                    <span
-                                      class="h-4 w-4 rounded-full"
-                                      style="background: rgb(128, 128, 128)"
-                                    ></span>
-                                    <span> طوسی</span>
-                                  </div>
-                                </div>
-                                <div
-                                  class="flex items-center justify-between gap-x-2"
-                                >
-                                  <!-- Product Price -->
-                                  <div
-                                    class="text-tertiary-500 dark:text-tertiary-400"
-                                  >
-                                    <span class="text-lg font-bold"
-                                      >1,800,000</span
-                                    >
-                                    <span class="text-sm">تومان</span>
-                                  </div>
-                                  <!-- Product Quantity -->
-                                  <div
-                                    class="flex h-10 w-24 items-center justify-between rounded-lg border border-secondary-light px-2 py-1 dark:border-primary-light/5"
-                                  >
-                                    <button
-                                      type="button"
-                                      data-action="increment"
-                                    >
-                                      <svg
-                                        class="h-5 w-5 text-tertiary-500 dark:text-tertiary-400"
-                                      >
-                                        <use xlink:href="#plus" />
-                                      </svg>
-                                    </button>
-                                    <input
-                                      value="1"
-                                      disabled
-                                      type="number"
-                                      class="flex h-5 w-full grow select-none items-center justify-center bg-transparent text-center text-sm text-quaternary-700 outline-none dark:text-primary-light"
-                                    />
-                                    <button
-                                      type="button"
-                                      data-action="decrement"
-                                    >
-                                      <svg
-                                        class="h-5 w-5 text-red-600 dark:text-red-500"
-                                      >
-                                        <use xlink:href="#trash" />
-                                      </svg>
-                                    </button>
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          </li>
                         </ul>
                       </div>
 
@@ -1578,7 +1447,7 @@
                           <div
                             class="text-quaternary-600 dark:text-quaternary-300"
                           >
-                            <span class="font-bold">1,200,000</span>
+                            <span class="font-bold">{{ total_price}}</span>
                             <span class="text-sm">تومان</span>
                           </div>
                         </div>
@@ -1613,6 +1482,7 @@
                     <!--                                    </div>-->
                     <!--                                </div>-->
                   </div>
+                {% endif %}
                   <!-- Theme -->
                   <div
                     class="cursor-pointer text-quaternary-700 dark:text-primary-light"
@@ -4263,10 +4133,10 @@
                       <img
                         alt=""
                         class="h-10 w-10 rounded-full"
-                        src="./assets/images/user.png"
+                        src="{{user.profile.image.url}}"
                       />
                     </span>
-                    <span class="line-clamp-1">تست تست تست تسستست تسست </span>
+                    <span class="line-clamp-1">{{ user.name}} </span>
                   </span>
                   <span>
                     <svg class="h-6 w-6">
@@ -5039,38 +4909,10 @@
                             <div
                               class="min-w-fit text-quaternary-500 dark:text-quaternary-400"
                             >
-                              جنس :
-                            </div>
-                            <div
-                              class="text-quaternary-600 dark:text-quaternary-300"
-                            >
-                              پارچه
+                                                    {{ product.features|safe}}
                             </div>
                           </li>
-                          <li class="flex gap-x-2">
-                            <div
-                              class="min-w-fit text-quaternary-500 dark:text-quaternary-400"
-                            >
-                              جنس زیره :
-                            </div>
-                            <div
-                              class="text-quaternary-600 dark:text-quaternary-300"
-                            >
-                              لاستیک
-                            </div>
-                          </li>
-                          <li class="flex gap-x-2">
-                            <div
-                              class="min-w-fit text-quaternary-500 dark:text-quaternary-400"
-                            >
-                              نحوه بسته شدن کفش :
-                            </div>
-                            <div
-                              class="text-quaternary-600 dark:text-quaternary-300"
-                            >
-                              بندی
-                            </div>
-                          </li>
+
                         </ul>
                       </div>
                     </div>
@@ -5089,13 +4931,13 @@
                             </div>
                             <fieldset class="flex flex-wrap items-center gap-1">
                               <legend class="sr-only">Color</legend>
-{% for color in product.color.all %}
+                {% for color in product.color.all %}
                               <div>
                                 <input
                                   checked
                                   type="radio"
-                                  name="color-desktop"
-                                  value="color-desktop-1"
+                                  name="color"
+                                  value="{{ color.id }}"
                                   id="color-desktop-{{ color.id }}"
                                   class="peer hidden"
                                 />
@@ -5121,119 +4963,6 @@
 
                             </fieldset>
                           </div>
-                          <!-- Size -->
-                          <div>
-                            <div
-                              class="mb-4 text-quaternary-700 dark:text-primary-light"
-                            >
-                              انتخاب سایز
-                            </div>
-                            <fieldset class="flex flex-wrap items-center gap-2">
-                              <legend class="sr-only">Size</legend>
-
-                              <div>
-                                <input
-                                  checked
-                                  type="radio"
-                                  name="size-desktop"
-                                  value="size-desktop-1"
-                                  id="size-desktop-1"
-                                  class="peer hidden"
-                                />
-
-                                <label
-                                  for="size-desktop-1"
-                                  class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-secondary-light p-1 shadow-base peer-checked:border-tertiary-500 hover:border-senary-200 dark:border-primary-light/5 peer-checked:dark:border-tertiary-400 dark:hover:border-primary-light/10"
-                                >
-                                  <p
-                                    class="text-sm font-bold text-quaternary-600 dark:text-quaternary-300 md:text-base"
-                                  >
-                                    37
-                                  </p>
-                                </label>
-                              </div>
-                              <div>
-                                <input
-                                  type="radio"
-                                  name="size-desktop"
-                                  value="size-desktop-2"
-                                  id="size-desktop-2"
-                                  class="peer hidden"
-                                />
-
-                                <label
-                                  for="size-desktop-2"
-                                  class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-secondary-light p-1 shadow-base peer-checked:border-tertiary-500 hover:border-senary-200 dark:border-primary-light/5 peer-checked:dark:border-tertiary-400 dark:hover:border-primary-light/10"
-                                >
-                                  <p
-                                    class="text-sm font-bold text-quaternary-600 dark:text-quaternary-300 md:text-base"
-                                  >
-                                    40
-                                  </p>
-                                </label>
-                              </div>
-                              <div>
-                                <input
-                                  type="radio"
-                                  name="size-desktop"
-                                  value="size-desktop-3"
-                                  id="size-desktop-3"
-                                  class="peer hidden"
-                                />
-
-                                <label
-                                  for="size-desktop-3"
-                                  class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-secondary-light p-1 shadow-base peer-checked:border-tertiary-500 hover:border-senary-200 dark:border-primary-light/5 peer-checked:dark:border-tertiary-400 dark:hover:border-primary-light/10"
-                                >
-                                  <p
-                                    class="text-sm font-bold text-quaternary-600 dark:text-quaternary-300 md:text-base"
-                                  >
-                                    44
-                                  </p>
-                                </label>
-                              </div>
-                              <div>
-                                <input
-                                  type="radio"
-                                  name="size-desktop"
-                                  value="size-desktop-4"
-                                  id="size-desktop-4"
-                                  class="peer hidden"
-                                />
-
-                                <label
-                                  for="size-desktop-4"
-                                  class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-secondary-light p-1 shadow-base peer-checked:border-tertiary-500 hover:border-senary-200 dark:border-primary-light/5 peer-checked:dark:border-tertiary-400 dark:hover:border-primary-light/10"
-                                >
-                                  <p
-                                    class="text-sm font-bold text-quaternary-600 dark:text-quaternary-300 md:text-base"
-                                  >
-                                    43
-                                  </p>
-                                </label>
-                              </div>
-                              <div>
-                                <input
-                                  type="radio"
-                                  name="size-desktop"
-                                  value="size-desktop-5"
-                                  id="size-desktop-5"
-                                  class="peer hidden"
-                                />
-
-                                <label
-                                  for="size-desktop-5"
-                                  class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-secondary-light p-1 shadow-base peer-checked:border-tertiary-500 hover:border-senary-200 dark:border-primary-light/5 peer-checked:dark:border-tertiary-400 dark:hover:border-primary-light/10"
-                                >
-                                  <p
-                                    class="text-sm font-bold text-quaternary-600 dark:text-quaternary-300 md:text-base"
-                                  >
-                                    42
-                                  </p>
-                                </label>
-                              </div>
-                            </fieldset>
-                          </div>
                         </div>
                       </div>
                       <div>
@@ -5255,7 +4984,7 @@
                         </div>
                         <!-- add to cart -->
                         <div class="mb-6">
-                          <button class="btn-primary w-full py-3">
+                          <button class="btn-primary w-full py-3" onclick="addToCart('{{ product.id }}')">
                             افزودن به سبد خرید
                           </button>
                         </div>
@@ -5456,13 +5185,13 @@
                       checked
                       type="radio"
                       name="color"
-                      value="color-1"
-                      id="color-1"
+                      value="{{ color.id }}"
+                      id="color-{{ color.id }}"
                       class="peer hidden"
                     />
 
                     <label
-                      for="color-1"
+                      for="color-{{ color.id }}"
                       class="relative block cursor-pointer rounded-full border-2 border-secondary-light p-2 shadow-base peer-checked:border-tertiary-500 hover:border-senary-200 dark:border-primary-light/5 peer-checked:dark:border-tertiary-400 dark:hover:border-primary-light/10"
                     >
                       <div class="flex items-center gap-x-2">
@@ -5483,76 +5212,7 @@
                 </fieldset>
                 <!-- Size -->
 
-                <div
-                  class="mb-4 text-sm text-quaternary-700 dark:text-primary-light md:text-base"
-                >
-                  انتخاب سایز
-                </div>
-                <fieldset class="flex flex-wrap items-center gap-2">
-                  <legend class="sr-only">Size</legend>
 
-                  <div>
-                    <input
-                      checked
-                      type="radio"
-                      name="size-mobile"
-                      value="size-mobile-1"
-                      id="size-mobile-1"
-                      class="peer hidden"
-                    />
-
-                    <label
-                      for="size-mobile-1"
-                      class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-secondary-light p-1 shadow-base peer-checked:border-tertiary-500 hover:border-senary-200 dark:border-primary-light/5 peer-checked:dark:border-tertiary-400 dark:hover:border-primary-light/10"
-                    >
-                      <p
-                        class="text-sm font-bold text-quaternary-600 dark:text-quaternary-300 md:text-base"
-                      >
-                        37
-                      </p>
-                    </label>
-                  </div>
-                  <div>
-                    <input
-                      type="radio"
-                      name="size-mobile"
-                      value="size-mobile-2"
-                      id="size-mobile-2"
-                      class="peer hidden"
-                    />
-
-                    <label
-                      for="size-mobile-2"
-                      class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-secondary-light p-1 shadow-base peer-checked:border-tertiary-500 hover:border-senary-200 dark:border-primary-light/5 peer-checked:dark:border-tertiary-400 dark:hover:border-primary-light/10"
-                    >
-                      <p
-                        class="text-sm font-bold text-quaternary-600 dark:text-quaternary-300 md:text-base"
-                      >
-                        40
-                      </p>
-                    </label>
-                  </div>
-                  <div>
-                    <input
-                      type="radio"
-                      name="size-mobile"
-                      value="size-mobile-3"
-                      id="size-mobile-3"
-                      class="peer hidden"
-                    />
-
-                    <label
-                      for="size-mobile-3"
-                      class="relative flex h-12 w-12 cursor-pointer items-center justify-center rounded-full border-2 border-secondary-light p-1 shadow-base peer-checked:border-tertiary-500 hover:border-senary-200 dark:border-primary-light/5 peer-checked:dark:border-tertiary-400 dark:hover:border-primary-light/10"
-                    >
-                      <p
-                        class="text-sm font-bold text-quaternary-600 dark:text-quaternary-300 md:text-base"
-                      >
-                        44
-                      </p>
-                    </label>
-                  </div>
-                </fieldset>
               </div>
               <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <div
@@ -5603,38 +5263,11 @@
                   <div
                     class="min-w-fit text-sm text-quaternary-500 dark:text-quaternary-400"
                   >
-                    جنس :
+                      {{ product.features|safe}}
                   </div>
-                  <div
-                    class="text-sm text-quaternary-600 dark:text-quaternary-300"
-                  >
-                    پارچه
-                  </div>
+
                 </li>
-                <li class="flex gap-x-2">
-                  <div
-                    class="min-w-fit text-sm text-quaternary-500 dark:text-quaternary-400"
-                  >
-                    جنس زیره :
-                  </div>
-                  <div
-                    class="text-sm text-quaternary-600 dark:text-quaternary-300"
-                  >
-                    لاستیک
-                  </div>
-                </li>
-                <li class="flex gap-x-2">
-                  <div
-                    class="min-w-fit text-sm text-quaternary-500 dark:text-quaternary-400"
-                  >
-                    نحوه بسته شدن کفش :
-                  </div>
-                  <div
-                    class="text-sm text-quaternary-600 dark:text-quaternary-300"
-                  >
-                    بندی
-                  </div>
-                </li>
+
               </ul>
             </div>
 
@@ -5645,7 +5278,7 @@
               <div class="flex items-center justify-between gap-x-6">
                 <!-- Button -->
                 <div class="flex grow">
-                  <button class="btn-primary w-full px-4 py-3 text-sm">
+                  <button class="btn-primary w-full px-4 py-3 text-sm" onclick="addToCart('{{ product.id }}')">
                     افزودن به سبد خرید
                   </button>
                 </div>
@@ -5668,7 +5301,7 @@
                   </div>
                   <!-- New Price -->
                   <div class="text-tertiary-500 dark:text-tertiary-400">
-                    <span class="font-semibold">1,200,000</span>
+                    <span class="font-semibold">{{ product.price }}</span>
                     <span class="text-sm font-light">تومان</span>
                   </div>
                 </div>
@@ -5688,125 +5321,8 @@
               <!-- Section Content -->
               <div class="swiper product-slider p-px">
                 <div class="swiper-wrapper">
-                  <div class="swiper-slide">
-                    <!-- Product Card -->
-                    <div
-                      class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                    >
-                      <div
-                        class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                      >
-                        <!-- image -->
-                        <div class="mb-2 md:mb-5" draggable="false">
-                          <a href="./product-detail.html">
-                            <img
-                              alt=""
-                              class="mx-auto w-32 rounded-lg md:w-auto"
-                              src="./assets/images/products/p8.png"
-                            />
-                          </a>
-                        </div>
-                        <!-- title -->
-                        <div class="mb-2">
-                          <a
-                            class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                            href="./product-detail.html"
-                          >
-                            کیف دوشی زنانه درسا مدل 49787
-                          </a>
-                        </div>
-                        <!-- Prices -->
-                        <div class="flex flex-col">
-                          <!-- Old price -->
-                          <div class="h-5 text-left">
-                            <del
-                              class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                            >
-                              10,000,000
-                            </del>
-                          </div>
-                          <div class="flex items-center justify-between">
-                            <div>
-                              <p
-                                class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                              >
-                                60%
-                              </p>
-                            </div>
-                            <!-- New price -->
-                            <div
-                              class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                            >
-                              4,000,000
-                              <span class="text-xs font-light md:text-sm"
-                                >تومان</span
-                              >
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="swiper-slide">
-                    <!-- Product Card -->
-                    <div
-                      class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                    >
-                      <div
-                        class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                      >
-                        <!-- image -->
-                        <div class="mb-2 md:mb-5" draggable="false">
-                          <a href="./product-detail.html">
-                            <img
-                              alt=""
-                              class="mx-auto w-32 rounded-lg md:w-auto"
-                              src="./assets/images/products/p1.png"
-                            />
-                          </a>
-                        </div>
-                        <!-- title -->
-                        <div class="mb-2">
-                          <a
-                            class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                            href="./product-detail.html"
-                          >
-                            کفش پیاده روی مردانه نیو بالانس مدل M520LN7
-                          </a>
-                        </div>
-                        <!-- Prices -->
-                        <div class="flex flex-col">
-                          <!-- Old price -->
-                          <div class="h-5 text-left">
-                            <del
-                              class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                            >
-                              10,000,000
-                            </del>
-                          </div>
-                          <div class="flex items-center justify-between">
-                            <div>
-                              <p
-                                class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                              >
-                                50%
-                              </p>
-                            </div>
-                            <!-- New price -->
-                            <div
-                              class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                            >
-                              5,000,000
-                              <span class="text-xs font-light md:text-sm"
-                                >تومان</span
-                              >
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
+{% for item in product_related %}
                   <div class="swiper-slide">
                     <div
                       class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
@@ -5817,11 +5333,11 @@
                       >
                         <!-- image -->
                         <div class="mb-2 md:mb-5" draggable="false">
-                          <a href="./product-detail.html">
+                          <a href="{% url 'main:product' item.id %}">
                             <img
                               alt=""
                               class="mx-auto w-32 rounded-lg md:w-auto"
-                              src="./assets/images/products/p6.png"
+                              src="{{ item.image1.url }}"
                             />
                           </a>
                         </div>
@@ -5831,7 +5347,7 @@
                             class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
                             href="./product-detail.html"
                           >
-                            کیف اداری مردانه درسا مدل 53156
+                              {{ item.name}}
                           </a>
                         </div>
                         <!-- Prices -->
@@ -5856,7 +5372,7 @@
                             <div
                               class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
                             >
-                              9,000,000
+                                {{ item.price}}
                               <span class="text-xs font-light md:text-sm"
                                 >تومان</span
                               >
@@ -5866,303 +5382,9 @@
                       </div>
                     </div>
                   </div>
+                    {% endfor %}
 
-                  <div class="swiper-slide">
-                    <div
-                      class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                    >
-                      <!-- Product Card -->
-                      <div
-                        class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                      >
-                        <!-- image -->
-                        <div class="mb-2 md:mb-5" draggable="false">
-                          <a href="./product-detail.html">
-                            <img
-                              alt=""
-                              class="mx-auto w-32 rounded-lg md:w-auto"
-                              src="./assets/images/products/p7.png"
-                            />
-                          </a>
-                        </div>
-                        <!-- title -->
-                        <div class="mb-2">
-                          <a
-                            class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                            href="./product-detail.html"
-                          >
-                            کیف دستی دلسی مدل CHATELET AIR 2.0 کد 1676350
-                          </a>
-                        </div>
-                        <!-- Prices -->
-                        <div class="flex flex-col">
-                          <!-- Old price -->
-                          <div class="h-5 text-left">
-                            <del
-                              class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                            >
-                              550,000
-                            </del>
-                          </div>
-                          <div class="flex items-center justify-between">
-                            <div>
-                              <p
-                                class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                              >
-                                10%
-                              </p>
-                            </div>
-                            <!-- New price -->
-                            <div
-                              class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                            >
-                              500,000
-                              <span class="text-xs font-light md:text-sm"
-                                >تومان</span
-                              >
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
 
-                  <div class="swiper-slide">
-                    <div
-                      class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                    >
-                      <!-- Product Card -->
-                      <div
-                        class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                      >
-                        <!-- image -->
-                        <div class="mb-2 md:mb-5" draggable="false">
-                          <a href="./product-detail.html">
-                            <img
-                              alt=""
-                              class="mx-auto w-32 rounded-lg md:w-auto"
-                              src="./assets/images/products/p2.png"
-                            />
-                          </a>
-                        </div>
-                        <!-- title -->
-                        <div class="mb-2">
-                          <a
-                            class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                            href="./product-detail.html"
-                          >
-                            کفش پیاده روی مردانه نیو بالانس مدل Mdrftlm2
-                          </a>
-                        </div>
-                        <!-- Prices -->
-                        <div class="flex flex-col">
-                          <!-- Old price -->
-                          <div class="h-5 text-left">
-                            <del
-                              class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                            >
-                              10,000,000
-                            </del>
-                          </div>
-                          <div class="flex items-center justify-between">
-                            <div>
-                              <p
-                                class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                              >
-                                20%
-                              </p>
-                            </div>
-                            <!-- New price -->
-                            <div
-                              class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                            >
-                              8,000,000
-                              <span class="text-xs font-light md:text-sm"
-                                >تومان</span
-                              >
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="swiper-slide">
-                    <div
-                      class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                    >
-                      <!-- Product Card -->
-                      <div
-                        class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                      >
-                        <!-- image -->
-                        <div class="mb-2 md:mb-5" draggable="false">
-                          <a href="./product-detail.html">
-                            <img
-                              alt=""
-                              class="mx-auto w-32 rounded-lg md:w-auto"
-                              src="./assets/images/products/p5.png"
-                            />
-                          </a>
-                        </div>
-                        <!-- title -->
-                        <div class="mb-2">
-                          <a
-                            class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                            href="./product-detail.html"
-                          >
-                            کفش پیاده روی زنانه مدل LT RBK
-                          </a>
-                        </div>
-                        <!-- Prices -->
-                        <div class="flex flex-col">
-                          <!-- Old price -->
-                          <div class="h-5 text-left">
-                            <del
-                              class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                            >
-                              200,000
-                            </del>
-                          </div>
-                          <div class="flex items-center justify-between">
-                            <div>
-                              <p
-                                class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                              >
-                                50%
-                              </p>
-                            </div>
-                            <!-- New price -->
-                            <div
-                              class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                            >
-                              100,000
-                              <span class="text-xs font-light md:text-sm"
-                                >تومان</span
-                              >
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="swiper-slide">
-                    <div
-                      class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                    >
-                      <!-- Product Card -->
-                      <div
-                        class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                      >
-                        <!-- image -->
-                        <div class="mb-2 md:mb-5" draggable="false">
-                          <a href="./product-detail.html">
-                            <img
-                              alt=""
-                              class="mx-auto w-32 rounded-lg md:w-auto"
-                              src="./assets/images/products/p4.png"
-                            />
-                          </a>
-                        </div>
-                        <!-- title -->
-                        <div class="mb-2">
-                          <a
-                            class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                            href="./product-detail.html"
-                          >
-                            کفش پیاده روی زنانه مدل M47767
-                          </a>
-                        </div>
-                        <!-- Prices -->
-                        <div class="flex flex-col">
-                          <!-- Old price -->
-                          <div class="h-5 text-left">
-                            <del
-                              class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                            >
-                              440,000
-                            </del>
-                          </div>
-                          <div class="flex items-center justify-between">
-                            <div>
-                              <p
-                                class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                              >
-                                10%
-                              </p>
-                            </div>
-                            <!-- New price -->
-                            <div
-                              class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                            >
-                              400,000
-                              <span class="text-xs font-light md:text-sm"
-                                >تومان</span
-                              >
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div class="swiper-slide">
-                    <div
-                      class="border-gradient group relative rounded-base p-px before:absolute before:-inset-px before:h-[calc(100%+2px)] before:w-[calc(100%+2px)] before:rounded-base"
-                    >
-                      <!-- Product Card -->
-                      <div
-                        class="relative rounded-xl bg-primary-light p-2 shadow-base dark:bg-secondary-dark md:p-5"
-                      >
-                        <!-- image -->
-                        <div class="mb-2 md:mb-5" draggable="false">
-                          <a href="./product-detail.html">
-                            <img
-                              alt=""
-                              class="mx-auto w-32 rounded-lg md:w-auto"
-                              src="./assets/images/products/p3.png"
-                            />
-                          </a>
-                        </div>
-                        <!-- title -->
-                        <div class="mb-2">
-                          <a
-                            class="line-clamp-2 h-10 text-sm text-quaternary-700 dark:text-primary-light md:h-12 md:text-base"
-                            href="./product-detail.html"
-                          >
-                            کفش پیاده روی مردانه نیو بالانس مدل Mdrftbg2
-                          </a>
-                        </div>
-                        <!-- Prices -->
-                        <div class="flex flex-col">
-                          <!-- Old price -->
-                          <div class="h-5 text-left">
-                            <del
-                              class="text-sm text-quaternary-500 decoration-red-600 dark:text-quaternary-400 dark:decoration-red-500 md:text-base"
-                            >
-                              12,000,000
-                            </del>
-                          </div>
-                          <div class="flex items-center justify-between">
-                            <div>
-                              <p
-                                class="w-9 rounded-full bg-red-500 py-px text-center text-sm text-primary-light dark:bg-red-500"
-                              >
-                                15%
-                              </p>
-                            </div>
-                            <!-- New price -->
-                            <div
-                              class="text-sm font-bold text-tertiary-500 dark:text-tertiary-400 md:text-base"
-                            >
-                              10,000,000
-                              <span class="text-xs font-light md:text-sm"
-                                >تومان</span
-                              >
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
                 </div>
                 <div class="swiper-button-next"></div>
                 <div class="swiper-button-prev"></div>
@@ -6246,67 +5468,19 @@
                 aria-labelledby="specs-tab"
               >
                 <ul class="space-y-6 text-sm">
-                  <li class="grid grid-cols-3 gap-x-2 lg:grid-cols-5">
-                    <div
-                      class="col-span-1 text-quaternary-500 dark:text-quaternary-400"
-                    >
-                      جنس
-                    </div>
-                    <div
-                      class="col-span-2 border-b border-secondary-light pb-4 text-quaternary-600 dark:border-primary-light/5 dark:text-quaternary-300 lg:col-span-4"
-                    >
-                      <ul class="space-y-4">
-                        <li>پارچه</li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li class="grid grid-cols-3 gap-x-2 lg:grid-cols-5">
-                    <div
-                      class="col-span-1 text-quaternary-500 dark:text-quaternary-400"
-                    >
-                      جنس زیره
-                    </div>
-                    <div
-                      class="col-span-2 border-b border-secondary-light pb-4 text-quaternary-600 dark:border-primary-light/5 dark:text-quaternary-300 lg:col-span-4"
-                    >
-                      <ul class="space-y-4">
-                        <li>لاستیک</li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li class="grid grid-cols-3 gap-x-2 lg:grid-cols-5">
-                    <div
-                      class="col-span-1 text-quaternary-500 dark:text-quaternary-400"
-                    >
-                      نحوه بسته شدن کفش
-                    </div>
-                    <div
-                      class="col-span-2 border-b border-secondary-light pb-4 text-quaternary-600 dark:border-primary-light/5 dark:text-quaternary-300 lg:col-span-4"
-                    >
-                      <ul class="space-y-4">
-                        <li>بندی</li>
-                      </ul>
-                    </div>
-                  </li>
-                  <li class="grid grid-cols-3 gap-x-2 lg:grid-cols-5">
-                    <div
-                      class="col-span-1 text-quaternary-500 dark:text-quaternary-400"
-                    >
-                      ویژگی‌های زیره
-                    </div>
-                    <div
-                      class="col-span-2 border-secondary-light pb-4 text-quaternary-600 dark:border-primary-light/5 dark:text-quaternary-300 lg:col-span-4"
-                    >
-                      <ul class="space-y-4">
-                        <li>انعطاف پذیر</li>
-                        <li>دارای بالشتک هوا</li>
-                        <li>قابلیت ارتجاعی</li>
-                        <li>قابلیت گردش هوا</li>
-                        <li>کاهش فشار وارده</li>
-                        <li>مقاوم در برابر سایش</li>
-                      </ul>
-                    </div>
-                  </li>
+
+                                    <li class="flex gap-x-2">
+                  <div
+                    class="min-w-fit text-sm text-quaternary-500 dark:text-quaternary-400"
+                  >
+                    {{product.features|safe}}
+                  </div>
+                  <div
+                    class="text-sm text-quaternary-600 dark:text-quaternary-300"
+                  >
+                    پارچه
+                  </div>
+                </li>
                 </ul>
               </div>
               <div

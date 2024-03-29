@@ -155,7 +155,7 @@ class TinyMCE(Textarea):
 
     .. _TinyMCE 4: https://www.tinymce.com/
     """
-    def __init__(self, attrs=None, mce_attrs=None, profile=None):
+    def __init__(self, attrs=None, mce_attrs={'theme_advanced_fonts': 'IRanYekan= static\tinymce\js\tinymce\skins\lightgray\fonts\IRANYekanXFaNum-Regular.woff2;'}, profile=None):
         super(TinyMCE, self).__init__(attrs)
         self.mce_attrs = mce_attrs or {}
         self.profile = get_spellcheck_config()

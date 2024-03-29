@@ -40,6 +40,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 TINYMCE_DEFAULT_CONFIG = {
 
+   'theme_advanced_fonts': 'IRanYekan=static\tinymce\js\tinymce\skins\lightgray\fonts\IRANYekanXFaNum-Regular.woff2',
    'height': 360,
    'width': 950,
    'cleanup_on_startup': True,
@@ -66,6 +67,7 @@ TINYMCE_DEFAULT_CONFIG = {
    'contextmenu': 'formats | link image',
    'menubar': True,
    'statusbar': True,
+
    }
 
 
