@@ -10,7 +10,7 @@ from .models import Item, Cart, CartItem, Category, Main_Page, Large_banner
 
 def index(request):
     blog = Blog.objects.all()
-    categories = Category.objects.all()[:5]
+    categories = Category.objects.all()[:6]
     category_menu = Category.objects.all()
     main_page = Main_Page.objects.all()[:1].get()
     large_banner = Large_banner.objects.all()
@@ -206,10 +206,20 @@ def add_to_cart(request, product_id, selectedColor):
     return JsonResponse({'message': 'با موفقیت انجام شد'})
 
 
-def childcategory_finder(request,child_id):
+def childcategory_finder(request, child_id):
     childcategory = ChildCategory.objects.filter(id=child_id).get()
     items = Item.objects.filter(child_cat=childcategory)
     context = {
         'items': items
     }
+    return render(request, 'shop.html', context)
+
+
+def categoryfinder(request, category_id):
+    category = Category.objects.filter(id=category_id).get()
+    items = Item.objects.filter(category=category)
+    context = {
+        'items': items
+    }
+
     return render(request, 'shop.html', context)
