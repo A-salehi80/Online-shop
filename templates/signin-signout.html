@@ -1,0 +1,416 @@
+
+{% load static %}
+<!doctype html>
+ <html dir="rtl" lang="fa">
+  <head>
+    <meta charset="UTF-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Eris Shop</title>
+    <link rel="shortcut icon" href="{% static 'images/logo.svg' %}">
+
+    <link href="{%static '/css/fonts.css'%}" rel="stylesheet" />
+    <link href="{%static '/css/dependencies/swiper.min.css'%}" rel="stylesheet" />
+    <link href="{%static '/css/app.css'%} " rel="stylesheet" />
+    <link href="{%static '/css/theme.css'%}" rel="stylesheet"/>
+
+    <!-- اینجا اضافه کنید -->
+    <link href="{%static '/css/custom.css'%}" rel="stylesheet" />
+
+    <script defer src="{%static '/scripts/dependencies/flowbite.min.js'%}"></script>
+    <script defer src="{%static '/scripts/dependencies/swiper.min.js'%}"></script>
+    <script defer src="{%static '/scripts/app.js'%}"></script>
+
+    <!-- اینجا اضافه کنید -->
+    <script defer src="{%static '/scripts/custom.js'%} ">
+
+    </script>
+      <script>
+function decreaseCartItemQuantity(cart_item_id,  decrease_amount) {
+    // Make an AJAX request to your Django backend
+    fetch(`/decrease_cart_item_quantity/${cart_item_id}/${ decrease_amount}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Reload the page or update the UI as needed
+            location.reload();
+        } else {
+            // Handle error response
+            console.error('خطا');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
+      <script>
+function increaseCartItemQuantity(cart_item_id,  increase_amount) {
+    // Make an AJAX request to your Django backend
+    fetch(`/increase_cart_item_quantity/${cart_item_id}/${ increase_amount}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Reload the page or update the UI as needed
+            location.reload();
+        } else {
+            // Handle error response
+            console.error('خطا');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
+      <script>
+function DeleteCartItem(cart_item_id) {
+    // Make an AJAX request to your Django backend
+    fetch(`/delete_cart_item/${cart_item_id}/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        }
+    })
+    .then(response => {
+        if (response.ok) {
+            // Reload the page or update the UI as needed
+            location.reload();
+        } else {
+            // Handle error response
+            console.error('خطا');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+}
+</script>
+<script>
+function addToCart(product_id) {
+    // Find the selected color radio button
+    var selectedColorRadioButton = document.querySelector('input[name="color"]:checked');
+
+    // Check if a color is selected
+    if (selectedColorRadioButton) {
+        // Extract the selected color value
+        var selectedColor = selectedColorRadioButton.value;
+
+        // Make an AJAX request to your Django backend
+        fetch(`/add_to_cart/${product_id}/${selectedColor}/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.ok) {
+                // Redirect to the cart view page
+                window.location.href = '{% url "main:Cart" %}';
+            } else {
+                // Handle error response
+                console.error('Failed to add product to cart');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    } else {
+        // Handle case when no color is selected
+        console.error('No color selected');
+    }
+}
+</script>
+
+      <script>
+      // Set Theme from Localstorage at site load
+      document.documentElement.classList.toggle(
+        "dark",
+        localStorage.getItem("theme") === "dark",
+      );
+    </script>
+  </head>
+
+{% block content %}
+
+{% endblock content %}
+       <footer
+        class="relative border-t border-secondary-light bg-primary-light dark:border-primary-light/5 dark:bg-secondary-dark"
+      >
+        <!-- Footer Logo -->
+        <div class="absolute inset-x-0 -top-3 flex items-center justify-center">
+          <div class="relative flex h-10 w-14 justify-center">
+            <div
+              class="absolute inset-0 -top-[2px] h-full w-full rounded-full bg-primary-light blur-[6px] dark:bg-secondary-dark"
+            ></div>
+
+            <svg
+              class="relative h-5 w-5 text-senary-200"
+              xmlns="http://www.w3.org/2000/svg"
+              width="135"
+              height="90"
+              viewBox="0 0 14 14"
+            >
+              <g
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <circle cx="7" cy="7" r="6.5" />
+                <path
+                  d="M.5 7h13m-4 0A11.22 11.22 0 0 1 7 13.5A11.22 11.22 0 0 1 4.5 7A11.22 11.22 0 0 1 7 .5A11.22 11.22 0 0 1 9.5 7Z"
+                />
+              </g>
+            </svg>
+          </div>
+        </div>
+
+        <!-- content -->
+        <div class="container">
+          <!-- Contact - Go to Top -->
+          <div
+            class="mt-10 flex flex-col items-center justify-between gap-y-4 md:flex-row"
+          >
+            <div
+              class="flex flex-col items-center gap-x-4 gap-y-4 text-sm text-quaternary-500 dark:text-quaternary-300 md:flex-row"
+            >
+              <p>تلفن پشتیبانی  {{main_page.Phone_no}} </p>
+              <span
+                class="hidden h-4 w-px rounded-full bg-senary-200 dark:bg-primary-light/20 md:block"
+              ></span>
+              <p>۷ روز هفته، ۲۴ ساعته پاسخگوی شما هستیم</p>
+            </div>
+            <div class="order-first flex md:order-last">
+              <button
+                class="inline-flex items-center gap-x-2 rounded-lg border border-senary-200 p-2 text-sm text-quaternary-700 hover:bg-senary-200/20 dark:border-primary-light/5 dark:text-primary-light dark:hover:bg-primary-light/5"
+                id="scroll-top-button-footer"
+                type="button"
+              >
+                <span>برگشت به بالا</span>
+                <span aria-hidden="true">
+                  <svg class="h-5 w-5 lg:h-6 lg:w-6">
+                    <use xlink:href="#chevron-up" />
+                  </svg>
+                </span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Subscribe - Social Links  -->
+          <div
+            class="relative mb-10 mt-10 flex flex-col items-center justify-between gap-x-4 gap-y-8 rounded-xl bg-secondary-light px-10 py-4 shadow-base backdrop-blur-3xl dark:bg-primary-dark md:flex-row"
+          >
+            <div>
+              <p class="text-sm text-quaternary-500 dark:text-quaternary-300">
+                از جدیدترین تخفیف ها با خبر شوید
+              </p>
+            </div>
+            <div class="w-full flex-1 flex-grow md:max-w-lg">
+              <div
+                class="flex w-full items-center justify-between gap-x-2 rounded-lg bg-primary-light dark:bg-secondary-dark"
+              >
+                <label class="sr-only" for="emailInput" id="email-label"
+                  >ایمیل</label
+                >
+                <input
+                  aria-labelledby="email-label"
+                  autocomplete="off"
+                  class="w-full border-none bg-transparent px-4 py-2.5 text-right text-quaternary-600 outline-none placeholder:text-right placeholder:text-sm placeholder:text-quaternary-500 focus:outline-none focus:ring-0 dark:text-quaternary-300 placeholder:dark:text-quaternary-400"
+                  dir="ltr"
+                  id="emailInput"
+                  placeholder="ایمیل شما"
+                  type="text"
+                />
+                <button class="btn-primary ml-1 w-24 py-2 text-sm">ثبت</button>
+              </div>
+            </div>
+            <div class="flex items-center justify-center gap-x-10 md:gap-x-6">
+              <div
+                class="text-quaternary-700 transition-colors duration-200 hover:text-rose-600 dark:text-primary-light hover:dark:text-rose-500"
+              >
+                <a aria-label="Follow us on instagram" href="#" target="_blank">
+                  <div class="sr-only">instagram link</div>
+                  <svg class="h-6 w-6">
+                    <use xlink:href="#instagram" />
+                  </svg>
+                </a>
+              </div>
+              <div
+                class="text-quaternary-700 transition-colors duration-200 hover:text-blue-600 dark:text-primary-light hover:dark:text-blue-500"
+              >
+                <a aria-label="Follow us on twitter" href="#" target="_blank">
+                  <div class="sr-only">x - twitter link</div>
+                  <svg class="h-6 w-6">
+                    <use xlink:href="#twitter" />
+                  </svg>
+                </a>
+              </div>
+              <div
+                class="text-quaternary-700 transition-colors duration-200 hover:text-red-600 dark:text-primary-light hover:dark:text-red-500"
+              >
+                <a aria-label="Follow us on aparat" href="#" target="_blank">
+                  <div class="sr-only">aparat link</div>
+                  <svg class="h-6 w-6">
+                    <use xlink:href="#aparat" />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-12 gap-y-10">
+            <div class="col-span-12 md:col-span-6">
+              <div
+                class="grid grid-cols-12 justify-items-center md:justify-items-start"
+              >
+                <div class="col-span-6 flex flex-col gap-y-6">
+                  <p
+                    class="select-none text-lg text-quaternary-700 dark:text-primary-light"
+                  >
+                    روتی کالا
+                  </p>
+                  <ul
+                    class="space-y-4 text-quaternary-500 dark:text-quaternary-300"
+                  >
+                    <li>
+                      <a
+                        class="py-2 hover:text-tertiary-500 hover:dark:text-tertiary-400"
+                        href="./return-terms.html"
+                      >
+                        شرایط مرجوعی
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="py-2 hover:text-tertiary-500 hover:dark:text-tertiary-400"
+                        href="./how-to-buy.html"
+                      >
+                        راهنمای خرید
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="py-2 hover:text-tertiary-500 hover:dark:text-tertiary-400"
+                        href="./rules-and-terms.html"
+                      >
+                        قوانین و مقررات
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="py-2 hover:text-tertiary-500 hover:dark:text-tertiary-400"
+                        href="./why-us.html"
+                      >
+                        چرا روتی کالا
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+                <div class="col-span-6 flex flex-col gap-y-6">
+                  <p
+                    class="select-none text-lg text-quaternary-700 dark:text-primary-light"
+                  >
+                    دسترسی سریع
+                  </p>
+                  <ul
+                    class="space-y-4 text-quaternary-500 dark:text-quaternary-300"
+                  >
+                    <li>
+                      <a
+                        class="py-2 hover:text-tertiary-500 hover:dark:text-tertiary-400"
+                        href="./profile-orders.html"
+                      >
+                        پیگیری سفارشات
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="py-2 hover:text-tertiary-500 hover:dark:text-tertiary-400"
+                        href="./contact.html"
+                      >
+                        تماس با ما
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="py-2 hover:text-tertiary-500 hover:dark:text-tertiary-400"
+                        href="./faq.html"
+                      >
+                        سوالات متداول
+                      </a>
+                    </li>
+                    <li>
+                      <a
+                        class="py-2 hover:text-tertiary-500 hover:dark:text-tertiary-400"
+                        href="./about.html"
+                      >
+                        درباره ما
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+            <div
+              class="col-span-12 flex items-center justify-center gap-x-2 md:col-span-6 md:justify-end"
+            >
+              <a href="#" class="relative">
+                <img
+                  alt="namad"
+                  class="h-[130px] w-[130px] blur-sm"
+                  src="./assets/images/namad.png"
+                />
+                <!-- Delete This -->
+                <span
+                  class="absolute inset-x-0 top-0 mx-auto w-fit rounded-lg bg-red-500 px-4 py-2 text-primary-light dark:bg-red-600"
+                >
+                  تستی
+                </span>
+              </a>
+              <a href="#" class="relative">
+                <img
+                  alt="samandehi"
+                  class="h-[130px] w-[130px] blur-sm"
+                  src="./assets/images/samandehi.png"
+                />
+                <span
+                  class="absolute inset-x-0 top-0 mx-auto w-fit rounded-lg bg-red-500 px-4 py-2 text-primary-light dark:bg-red-600"
+                >
+                  تستی
+                </span>
+              </a>
+            </div>
+          </div>
+
+          <!-- Copyright -->
+          <div
+            class="mt-4 flex items-center justify-center border-t border-secondary-light py-4 dark:border-primary-light/5"
+          >
+            <p
+              class="text-xs text-quaternary-500 dark:text-quaternary-400 xs:text-sm"
+            >
+              کلیه حقوق این سایت متعلق به فروشگاه روتی کالا می‌باشد.
+            </p>
+          </div>
+        </div>
+      </footer>
+
+</html>
+
+
