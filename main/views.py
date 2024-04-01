@@ -268,7 +268,6 @@ def categoryfinder(request, category_id):
         'category_menu': category_menu,
         'user_cart':user_cart,
         'cart_count':cart_count,
-        'category_menu':category_menu,
         'total_price':total_price,
         'total_no':total_no,
         'main_page': main_page
@@ -277,3 +276,38 @@ def categoryfinder(request, category_id):
     }
 
     return render(request, 'shop.html', context)
+def blog_detail(request,blog_id):
+    blog = Blog.objects.filter(id=blog_id).get()
+    tags = blog.tags.get_queryset()
+    related_blog = Blog.objects.filter(tags__in=tags).exclude(id=blog_id).distinct()
+    hot_blog = Blog.objects.order_by('rate')
+    category_menu = Category.objects.all()
+    main_page = Main_Page.objects.all()[:1].get()
+    total_price = 0
+    total_no = 0
+    prof = request.user.profile
+    cart = prof.cart.cartitem_set.all()
+    cart_count = cart.count()
+    user_cart = request.user.profile.cart.cartitem_set.all()
+    for item in cart:
+        total_no += 1
+        item_price = item.item.price * item.quantity
+        total_price += item_price
+
+    context = {
+        'blog': blog,
+        'related_blog': related_blog,
+        'hot_blog': hot_blog,
+        'category_menu': category_menu,
+        'user_cart': user_cart,
+        'cart_count': cart_count,
+        'total_price': total_price,
+        'total_no': total_no,
+        'main_page': main_page
+
+    }
+    return render(request, 'blog-detail.html', context)
+def blog(request):
+
+    context={}
+    return render(request,'blog.html',context)

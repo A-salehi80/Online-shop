@@ -21,6 +21,7 @@ class Blog(models.Model):
     modify_date = models.DateField(auto_now=True)
     tags = models.ManyToManyField(Tag)
     ID_NO = models.CharField(max_length=225, blank=True, null=True, unique=True)
+    rate = models.IntegerField(default=1)
 
     def __str__(self):
         return self.title
