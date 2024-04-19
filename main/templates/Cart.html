@@ -84,7 +84,7 @@
                       >
                         <!-- Image -->
                         <div class="relative row-span-2 min-w-fit xs:mx-auto">
-                          <a href="#">
+                          <a href="{% url 'main:product' item.id %}">
                             <img
                               alt=""
                               class="w-25 rounded-lg sm:w-28"
@@ -109,7 +109,7 @@
                           <!-- Title -->
                           <a
                             class="line-clamp-2 text-sm text-quaternary-700 dark:text-primary-light xs:text-base"
-                            href="#"
+                            href="{% url 'main:product' item.id %}"
                           >
                               {{ item.item.name}}
                           </a>

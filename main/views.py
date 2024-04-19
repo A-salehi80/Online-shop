@@ -3,6 +3,7 @@ from .models import Blog, Colors, ChildCategory
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from usermanager.models import Profile
+from django.views.generic import ListView
 from django.db.models import Sum
 from django.shortcuts import redirect, get_object_or_404
 from .models import Item, Cart, CartItem, Category, Main_Page, Large_banner
@@ -136,7 +137,7 @@ def cart_view(request):
         'total_price': total_price,
         'total_no': total_no,
         'category_menu': category_menu,
-        'main_page':main_page
+        'main_page': main_page
     }
     return render(request, 'Cart.html', context)
 
@@ -235,11 +236,42 @@ def add_to_cart(request, product_id, selectedColor):
 
 def childcategory_finder(request, child_id):
     childcategory = ChildCategory.objects.filter(id=child_id).get()
-    items = Item.objects.filter(child_cat=childcategory)
+    item = Item.objects.filter(child_cat=childcategory).all()
     category_menu = Category.objects.all()
     main_page = Main_Page.objects.all()[:1].get()
+    total_price = 0
+    total_no = 0
+    if request.user.is_authenticated:
+        childcategory = ChildCategory.objects.filter(id=child_id).get()
+        item = Item.objects.filter(child_cat=childcategory).all()
+        main_page = Main_Page.objects.all()[:1].get()
+        item_list_latest = Item.objects.all().order_by('ID_NO')
+        item_list = Item.objects.all()
+        category_menu = Category.objects.all()
+        prof = request.user.profile
+        cart = prof.cart.cartitem_set.all()
+        cart_count = cart.count()
+        user_cart = request.user.profile.cart.cartitem_set.all()
+        for i in cart:
+            total_no += 1
+            item_price = i.item.price * i.quantity
+            total_price += item_price
+        context = {
+            'cart_count': cart_count,
+            'cart': cart,
+            'item_list': item_list,
+            'item_list_latest': item_list_latest,
+            'total_price': total_price,
+            'total_no': total_no,
+            'user_cart': user_cart,
+            'category_menu': category_menu,
+            'main_page': main_page,
+        'item': item,
+
+        }
+        return render(request, 'shop.html', context)
     context = {
-        'items': items,
+        'item': item,
         'category_menu': category_menu,
         'main_page': main_page
     }
@@ -248,7 +280,7 @@ def childcategory_finder(request, child_id):
 
 def categoryfinder(request, category_id):
     category = Category.objects.filter(id=category_id).get()
-    items = Item.objects.filter(category=category)
+    item = Item.objects.filter(category=category)
     category_menu = Category.objects.all()
     prof = request.user.profile
     cart = prof.cart.cartitem_set.all()
@@ -257,14 +289,14 @@ def categoryfinder(request, category_id):
     total_price = 0
     total_no = 0
     main_page = Main_Page.objects.all()[:1].get()
-    for item in cart:
+    for i in cart:
       total_no += 1
-      item_price = item.item.price * item.quantity
+      item_price = i.item.price * i.quantity
       total_price += item_price
 
 
     context = {
-        'items': items,
+        'item': item,
         'category_menu': category_menu,
         'user_cart':user_cart,
         'cart_count':cart_count,
@@ -276,7 +308,9 @@ def categoryfinder(request, category_id):
     }
 
     return render(request, 'shop.html', context)
-def blog_detail(request,blog_id):
+
+
+def blog_detail(request, blog_id):
     blog = Blog.objects.filter(id=blog_id).get()
     tags = blog.tags.get_queryset()
     related_blog = Blog.objects.filter(tags__in=tags).exclude(id=blog_id).distinct()
@@ -285,29 +319,152 @@ def blog_detail(request,blog_id):
     main_page = Main_Page.objects.all()[:1].get()
     total_price = 0
     total_no = 0
-    prof = request.user.profile
-    cart = prof.cart.cartitem_set.all()
-    cart_count = cart.count()
-    user_cart = request.user.profile.cart.cartitem_set.all()
-    for item in cart:
-        total_no += 1
+
+    if request.user.is_authenticated:
+        blog = Blog.objects.filter(id=blog_id).get()
+        related_blog = Blog.objects.filter(tags__in=tags).exclude(id=blog_id).distinct()
+        hot_blog = Blog.objects.order_by('rate')
+        main_page = Main_Page.objects.all()[:1].get()
+        category_menu = Category.objects.all()
+        prof = request.user.profile
+        cart = prof.cart.cartitem_set.all()
+        cart_count = cart.count()
+        user_cart = request.user.profile.cart.cartitem_set.all()
+        for item in cart:
+            total_no += 1
         item_price = item.item.price * item.quantity
         total_price += item_price
+        context = {
+            'cart_count': cart_count,
+            'cart': cart,
+            'total_price': total_price,
+            'total_no': total_no,
+            'user_cart': user_cart,
+            'category_menu': category_menu,
+            'main_page': main_page,
+            'blog': blog,
+        'related_blog': related_blog,
+        'hot_blog': hot_blog,
 
+
+        }
+        return render(request, 'blog-detail.html', context)
     context = {
         'blog': blog,
         'related_blog': related_blog,
         'hot_blog': hot_blog,
         'category_menu': category_menu,
-        'user_cart': user_cart,
-        'cart_count': cart_count,
         'total_price': total_price,
         'total_no': total_no,
         'main_page': main_page
 
     }
     return render(request, 'blog-detail.html', context)
-def blog(request):
 
-    context={}
-    return render(request,'blog.html',context)
+
+class Shopview(ListView):
+    context_object_name = 'item'
+    template_name = 'shop.html'
+
+
+class item_list(Shopview):
+    queryset = Item.objects.all().order_by('-id')
+    context_object_name = 'item'
+
+
+def item_list(request):
+    item = Item.objects.all().order_by('-id')
+    category_menu = Category.objects.all()
+    main_page = Main_Page.objects.all()[:1].get()
+    total_price = 0
+    total_no = 0
+
+    if request.user.is_authenticated:
+        item = Item.objects.all().order_by('-id')
+        main_page = Main_Page.objects.all()[:1].get()
+        user_cart = request.user.profile.cart.cartitem_set.all()
+        item_list_latest = Item.objects.all().order_by('ID_NO')
+        item_list = Item.objects.all()
+        category_menu = Category.objects.all()
+        prof = request.user.profile
+        cart = prof.cart.cartitem_set.all()
+        cart_count = cart.count()
+        user_cart = request.user.profile.cart.cartitem_set.all()
+        for i in cart:
+            total_no += 1
+            item_price = i.item.price * i.quantity
+            total_price += item_price
+        context = {
+            'cart_count': cart_count,
+            'cart': cart,
+            'item_list': item_list,
+            'item_list_latest': item_list_latest,
+            'total_price': total_price,
+            'total_no': total_no,
+            'user_cart': user_cart,
+            'category_menu': category_menu,
+            'main_page': main_page,
+            'item':item
+
+
+        }
+        return render(request,'shop.html',context)
+
+    context = {
+        'blog': blog,
+        'category_menu': category_menu,
+        'total_price': total_price,
+        'total_no': total_no,
+        'main_page': main_page,
+        'item':item
+
+    }
+    return render(request, 'shop.html', context)
+
+
+def blog(request):
+    item = Blog.objects.all().order_by('-id')
+    category_menu = Category.objects.all()
+    main_page = Main_Page.objects.all()[:1].get()
+    total_price = 0
+    total_no = 0
+
+    if request.user.is_authenticated:
+        item = Blog.objects.all().order_by('-id')
+        main_page = Main_Page.objects.all()[:1].get()
+        item_list_latest = Item.objects.all().order_by('ID_NO')
+        item_list = Item.objects.all()
+        category_menu = Category.objects.all()
+        prof = request.user.profile
+        cart = prof.cart.cartitem_set.all()
+        cart_count = cart.count()
+        user_cart = request.user.profile.cart.cartitem_set.all()
+        for i in cart:
+            total_no += 1
+            item_price = i.item.price * i.quantity
+            total_price += item_price
+        context = {
+            'cart_count': cart_count,
+            'cart': cart,
+            'item_list': item_list,
+            'item_list_latest': item_list_latest,
+            'total_price': total_price,
+            'total_no': total_no,
+            'user_cart': user_cart,
+            'category_menu': category_menu,
+            'main_page': main_page,
+            'item': item
+
+        }
+        return render(request, 'blog.html', context)
+
+    context = {
+        'blog': blog,
+        'category_menu': category_menu,
+        'total_price': total_price,
+        'total_no': total_no,
+        'main_page': main_page,
+        'item': item
+
+    }
+    return render(request, 'blog.html', context)

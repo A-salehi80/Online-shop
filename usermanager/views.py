@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.shortcuts import render, redirect
 from .forms import UserCreationForm, UserRegBase
 from django.contrib.auth import login
-
+from django.contrib import messages
 
 def register(request):
 

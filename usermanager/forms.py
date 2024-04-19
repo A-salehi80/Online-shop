@@ -39,7 +39,11 @@ class UserRegBase(forms.ModelForm):
      """
 
     error_messages = {
-        "password_mismatch": _("The two password fields didn’t match."),
+        "password_mismatch": _("رمزعبور با تکرارش همخوانی ندارد."),
+        "existed_user":_("کاربری با این نام کاربری موجود است.لطفا نام کاربری را تغییر دهید"),
+        "password_short":_("")
+
+
     }
     password1 = forms.CharField(
         label=_("Password"),
@@ -116,9 +120,7 @@ class UserCreationForm(UserRegBase):
             self._update_errors(
                 ValidationError(
                     {
-                        "username": self.instance.unique_error_message(
-                            self._meta.model, ["username"]
-                        )
+                        "username": self.error_messages['existed_user']
                     }
                 )
             )
