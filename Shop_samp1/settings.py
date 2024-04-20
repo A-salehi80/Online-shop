@@ -70,6 +70,12 @@ TINYMCE_DEFAULT_CONFIG = {
 
    }
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+}
 
 
 # Application definition
@@ -81,9 +87,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    #local apps
     'main.apps.MainConfig',
     'usermanager.apps.UsermanagerConfig',
     'tiny.apps.TinyConfig',
+    'api_v1.apps.ApiV1Config',
+    #third party apps
+    'rest_framework',
 
 ]
 

@@ -19,10 +19,13 @@ from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
 
+
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include('main.urls')),
     path('users/', include('usermanager.urls')),
     path('tinymce/', include('tiny.urls')),
+    path('api/v1/', include('api_v1.urls')),
+    path('api-auth',include('rest_framework.urls'))
 
 ]+static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

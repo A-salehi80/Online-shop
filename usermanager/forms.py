@@ -13,7 +13,8 @@ class UserLoginForm(AuthenticationForm):
         super(UserLoginForm, self).__init__(*args, **kwargs)
 
     username = UsernameField(widget=forms.TextInput(
-        attrs={'class': 'peer w-full rounded-lg border-none bg-transparent p-4 text-left text-quaternary-700 placeholder-transparent focus:outline-none focus:ring-0 dark:text-primary-light',
+        attrs={'class': 'peer w-full rounded-lg border-none bg-transparent p-4 text-left text-quaternary-700 '
+                        'placeholder-transparent focus:outline-none ''focus:ring-0 dark:text-primary-light',
                'data-placeholder': 'شماره موبایل یا ایمیل',
                'id': 'username',
                'type': 'text',
@@ -23,7 +24,8 @@ class UserLoginForm(AuthenticationForm):
     password = forms.CharField(
         widget=forms.PasswordInput(
          attrs={
-            'class': 'peer w-full rounded-lg border-none bg-transparent p-4 text-left text-quaternary-700 placeholder-transparent focus:outline-none focus:ring-0 dark:text-primary-light',
+            'class': 'peer w-full rounded-lg border-none bg-transparent p-4 text-left text-quaternary-700'
+                     ' placeholder-transparent ''focus:outline-none focus:ring-0 dark:text-primary-light',
             'placeholder': 'شماره موبایل یا ایمیل',
             'id': 'password',
             'type': 'text',
@@ -40,8 +42,8 @@ class UserRegBase(forms.ModelForm):
 
     error_messages = {
         "password_mismatch": _("رمزعبور با تکرارش همخوانی ندارد."),
-        "existed_user":_("کاربری با این نام کاربری موجود است.لطفا نام کاربری را تغییر دهید"),
-        "password_short":_("")
+        "existed_user": _("کاربری با این نام کاربری موجود است.لطفا نام کاربری را تغییر دهید"),
+        "password_short": _("")
 
 
     }
@@ -49,22 +51,22 @@ class UserRegBase(forms.ModelForm):
         label=_("Password"),
         strip=False,
         widget=forms.PasswordInput(attrs={"autocomplete": "new-password",
-                                          "id":"password1"}),
+                                          "id": "password1"}),
         help_text=password_validation.password_validators_help_text_html(),
     )
     password2 = forms.CharField(
         label=_("Password confirmation"),
         widget=forms.PasswordInput(attrs={
             "autocomplete": "new-password",
-            "id" : "password2"}),
+            "id": "password2"}),
         strip=False,
         help_text=_("Enter the same password as before, for verification."),
     )
     email = forms.EmailField(
         label=_("email"),
-        widget=forms.EmailInput(attrs={"id" : "email"})
+        widget=forms.EmailInput(attrs={"id": "email"})
     )
-    username = forms.CharField(widget=forms.TextInput(attrs={"id":"username"}))
+    username = forms.CharField(widget=forms.TextInput(attrs={"id": "username"}))
 
     class Meta:
         model = usermanager.models.User
@@ -126,6 +128,3 @@ class UserCreationForm(UserRegBase):
             )
         else:
             return username
-
-
-
